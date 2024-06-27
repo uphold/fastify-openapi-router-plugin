@@ -1,0 +1,6 @@
+*.dump
+*.dump.bz2.gpg
+coverage
+node_modules
+npm-debug.log*
+yarn.lock
