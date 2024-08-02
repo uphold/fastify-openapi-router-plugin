@@ -9,6 +9,31 @@ describe('validateSpec()', () => {
     );
   });
 
+  it('should throw an error on unsupported OpenAPI versions', async () => {
+    const specSwagger2 = {
+      info: {
+        title: 'Title',
+        version: '1'
+      },
+      paths: {},
+      swagger: '2.0'
+    };
+    const specOpenApi2 = {
+      info: {},
+      openapi: '2.0.0',
+      paths: {}
+    };
+    const specOpenApi4 = {
+      info: {},
+      openapi: '4.0.0',
+      paths: {}
+    };
+
+    await expect(validateSpec({ spec: specSwagger2 })).rejects.toThrowError(/Unsupported OpenAPI version: 2\.0/);
+    await expect(validateSpec({ spec: specOpenApi2 })).rejects.toThrowError(/Unsupported OpenAPI version: 2\.0\.0/);
+    await expect(validateSpec({ spec: specOpenApi4 })).rejects.toThrowError(/Unsupported OpenAPI version: 4\.0\.0/);
+  });
+
   it('should return a parsed spec', async () => {
     const spec = {
       info: {
