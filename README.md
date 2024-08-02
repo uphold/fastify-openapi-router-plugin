@@ -5,7 +5,7 @@
 A plugin for [Fastify](https://fastify.dev) to connect routes with a OpenAPI 3.x specification. It does so by:
 
 - Providing a way to register routes using the `operationId` defined in your specification instead of having to manually call `fastify.route` with the correct URL, method, and schema.
-- Handling `securitySchemes` and `security` keywords defined in your OpenAPI specification, simplifying the implementation of authentication and authorization middleware.
+- Handling `securitySchemes` and `security` keywords defined in your specification, simplifying the implementation of authentication and authorization middleware.
 
 ## Installation
 
