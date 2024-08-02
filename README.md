@@ -1,8 +1,11 @@
 # @uphold/fastify-openapi-router-plugin
 
-This plugin provides an easy way to implement [Fastify](https://fastify.dev) routes from an OpenAPI 3.1 specification using `operationId` names.
-
 [![Tests](https://github.com/uphold/fastify-openapi-router-plugin/actions/workflows/tests.yaml/badge.svg)](https://github.com/uphold/fastify-openapi-router-plugin/actions/workflows/tests.yaml)
+
+A plugin for [Fastify](https://fastify.dev) to connect routes with a OpenAPI 3.x specification. It does so by:
+
+- Providing a way to register routes using the `operationId` defined in your specification instead of having to manually call `fastify.route` with the correct URL, method, and schema.
+- Handling `securitySchemes` and `security` keywords defined in your OpenAPI specification, simplifying the implementation of authentication and authorization middleware.
 
 ## Installation
 
@@ -53,7 +56,7 @@ await fastify.register(import('@fastify/fastify-openapi-router-plugin'), {
 
 | Option | Type | Description |
 | ------ | ---- | ----------  |
-| `spec` | `string` | `object` | **REQUIRED**. A file path or object of your OpenAPI specification. |
+| `spec` | `string` or `object` | **REQUIRED**. A file path or object of your OpenAPI specification. |
 | `securityHandlers` | `object` | An object containing the security handlers that match [Security Schemes](https://github.com/OAI/OpenAPI-Specification/blob/main/versions/3.1.0.md#security-scheme-object) described in your OpenAPI specification. |
 
 #### `spec`
@@ -204,7 +207,7 @@ fastify.oas.route({
 
 ### Error handler
 
-If there was an error associated with `security` processing of a request, the plugin will throw an `UnauthorizedError`. It defaults to displaying a `401` status code with `{ code: 'unauthorized', 'message': 'Unauthorized' }` as the payload. You can override this behavior by registering a fastify error handler:
+If there was an error associated with `security` processing of a request, the plugin will throw an `UnauthorizedError`. It defaults to displaying a `401` status code with `{ code: 'FST_OAS_UNAUTHORIZED', 'message': 'Unauthorized' }` as the payload. You can override this behavior by registering a fastify error handler:
 
 ```js
 fastify.setErrorHandler((error, request, reply) => {
