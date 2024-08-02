@@ -13,7 +13,7 @@ A plugin for [Fastify](https://fastify.dev) to connect routes with a OpenAPI 3.x
 npm install @uphold/fastify-openapi-router-plugin
 ```
 
-This plugin is written and exported in ESM only. If you are using CommonJS, consider making a PR and we will be happy to review it.
+This plugin is written and exported in ESM only. If you are using CommonJS, consider making a pull-request and we will happily review it.
 
 ## Usage
 
@@ -61,7 +61,7 @@ await fastify.register(import('@fastify/fastify-openapi-router-plugin'), {
 
 #### `spec`
 
-If you don't provide a valid OpenAPI specification, plugin will throw an error telling you what's wrong.
+If you don't provide a valid OpenAPI specification, the plugin will throw an error telling you what's wrong.
 
 **Sample using a file path**
 
@@ -88,7 +88,7 @@ If you haven't defined any [Security Schemes](https://github.com/OAI/OpenAPI-Spe
 
 Security handlers are executed as a `onRequest` hook for every API operation if plugin founds a [Security Requirement Object](https://github.com/OAI/OpenAPI-Specification/blob/main/versions/3.1.0.md#security-requirement-object) defined on the root level or operation level of your OpenAPI specification. According to [Fastify Lifecycle](https://fastify.dev/docs/latest/Reference/Lifecycle/), it is the most secure way to implement an authentication layer because it avoids parsing the body for unauthorized accesses.
 
-If your operation `security` entries use the same security scheme, the plugin will call the security handler only once. Moreover, the plugin will only call the security handler if there's a value extracted from the request.
+If your operation's `security` use repeated security schemes, the plugin will call the associated security handler only once per request and cache its result. Furthermore, the plugin is smart enough to skip `security` blocks that have missing values from the request. For example, if you have a `security` block with `APIKey` and `OAuth2` and the request contains the API key but no bearer token, the plugin will automatically skip the block altogether without calling any security handler.
 
 The security handler should either throw an error or return an object with `{ data, scopes }` where `data` becomes available as `request.oas.security.<name>` in your route handler and `scopes` is array of strings that will be used to verify if the scopes defined in the API operation are satisfied.
 
@@ -136,10 +136,10 @@ await fastify.register(import('@fastify/fastify-openapi-router-plugin'), {
 ```
 
 > [!TIP]
-> The roles returned by the security handler can contain **wildcards**. For example, if the security handler returns `{ scopes: ['read:*'] }`, the route will be authorized for any scope that starts with `read:`.
+> The `scopes` returned by the security handler can contain **wildcards**. For example, if the security handler returns `{ scopes: ['read:*'] }`, the route will be authorized for any security scope that starts with `read:`.
 
 > [!IMPORTANT]
-> If your specification uses `http` security schemes with `in: cookie` you must register [@fastify/cookie](https://github.com/fastify/fastify-cookie) before this plugin.
+> If your specification uses `http` security schemes with `in: cookie`, you must register [@fastify/cookie](https://github.com/fastify/fastify-cookie) before this plugin.
 
 ### Decorators
 
@@ -207,7 +207,7 @@ fastify.oas.route({
 
 ### Error handler
 
-If there was an error associated with `security` processing of a request, the plugin will throw an `UnauthorizedError`. It defaults to displaying a `401` status code with `{ code: 'FST_OAS_UNAUTHORIZED', 'message': 'Unauthorized' }` as the payload. You can override this behavior by registering a fastify error handler:
+The plugin will throw an `UnauthorizedError` when none of the `security` blocks succeed. By default, this error originates a `401` reply with `{ code: 'FST_OAS_UNAUTHORIZED', 'message': 'Unauthorized' }` as the payload. You can override this behavior by registering a fastify error handler:
 
 ```js
 fastify.setErrorHandler((error, request, reply) => {
@@ -219,18 +219,18 @@ fastify.setErrorHandler((error, request, reply) => {
 });
 ```
 
-The `report` property contains an array of objects with the following structure:
+The `securityReport` property contains an array of objects with the following structure:
 
 ```js
 [
   {
     ok: false,
+    // Schemes can be an empty object if the security block was skipped due to missing values.
     schemes: {
       OAuth2: {
         ok: false,
         // Error thrown by the security handler or fastify.oas.errors.ScopesMismatchError if the scopes were not satisfied.
         error: new Error(),
-        scopes: ['read:pets']
       }
     }
   }
