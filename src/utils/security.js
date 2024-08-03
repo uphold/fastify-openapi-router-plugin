@@ -1,5 +1,4 @@
 import { createScopesMismatchError } from '../errors/index.js';
-import _ from 'lodash-es';
 
 const getValueForHttpSchemeType = (request, securityScheme) => {
   if (securityScheme.scheme === 'bearer') {
@@ -61,23 +60,18 @@ export const extractSecuritySchemeValueFromRequest = (request, securityScheme) =
 };
 
 export const verifyScopes = (providedScopes, requiredScopes) => {
-  const missingScopes = [];
+  const missingScopes = requiredScopes.filter(requiredScope => {
+    const hasMatchingScope = providedScopes.some(providedScope => {
+      if (providedScope.endsWith('*')) {
+        const prefixScope = providedScope.match(/(.*)\*$/)[1];
 
-  requiredScopes.forEach(requiredScope => {
-    if (providedScopes.includes(requiredScope)) {
-      return;
-    }
+        return requiredScope.startsWith(prefixScope);
+      }
 
-    const parts = requiredScope.split(':');
-    const wildcardScopes = parts.map((part, index) => {
-      return _.trimStart(parts.slice(0, index).join(':') + ':*', ':');
+      return providedScope === requiredScope;
     });
 
-    const matches = wildcardScopes.some(matchingScope => providedScopes.includes(matchingScope));
-
-    if (!matches) {
-      missingScopes.push(requiredScope);
-    }
+    return !hasMatchingScope;
   });
 
   if (missingScopes.length > 0) {
