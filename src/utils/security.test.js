@@ -24,7 +24,7 @@ describe('verifyScopes()', () => {
   };
 
   it('should verify regular scopes correctly against required scopes', async () => {
-    let provided = ['read', 'write'];
+    const provided = ['read', 'write'];
 
     runTest({ missing: [], provided, required: [] });
     runTest({ missing: [], provided, required: ['read', 'write'] });
@@ -49,7 +49,7 @@ describe('verifyScopes()', () => {
   });
 
   it('should verify regular scopes correctly against * suffix', async () => {
-    const provided = ['user:*', 'transaction:foo:*'];
+    let provided = ['user:*', 'transaction:foo:*'];
 
     runTest({ missing: [], provided, required: ['user:foo'] });
     runTest({ missing: [], provided, required: ['user:foo:bar'] });
@@ -59,6 +59,28 @@ describe('verifyScopes()', () => {
     runTest({ missing: ['user'], provided, required: ['user'] });
     runTest({ missing: ['transaction:foo'], provided, required: ['transaction:foo'] });
     runTest({ missing: ['transaction::'], provided, required: ['transaction::'] });
+    runTest({ missing: [''], provided, required: [''] });
+
+    provided = ['user.*', 'transaction.foo.*'];
+
+    runTest({ missing: [], provided, required: ['user.foo'] });
+    runTest({ missing: [], provided, required: ['user.foo.bar'] });
+    runTest({ missing: [], provided, required: ['user.'] });
+    runTest({ missing: [], provided, required: ['transaction.foo.bar'] });
+    runTest({ missing: [], provided, required: ['transaction.foo.'] });
+    runTest({ missing: ['user'], provided, required: ['user'] });
+    runTest({ missing: ['transaction.foo'], provided, required: ['transaction.foo'] });
+    runTest({ missing: ['transaction..'], provided, required: ['transaction..'] });
+    runTest({ missing: [''], provided, required: [''] });
+
+    provided = ['user*', 'transaction:foo*'];
+
+    runTest({ missing: [], provided, required: ['userfoo'] });
+    runTest({ missing: [], provided, required: ['user'] });
+    runTest({ missing: [], provided, required: ['transaction:foo'] });
+    runTest({ missing: [], provided, required: ['transaction:foobar'] });
+    runTest({ missing: ['use'], provided, required: ['use'] });
+    runTest({ missing: ['transaction:foz'], provided, required: ['transaction:foz'] });
     runTest({ missing: [''], provided, required: [''] });
   });
 });
