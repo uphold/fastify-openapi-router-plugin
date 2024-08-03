@@ -57,7 +57,7 @@ export const parseSecurity = (operation, spec, securityHandlers) => {
       const blockHasMissingValues = Object.keys(block).some(name => readSchemeValue(name) == null);
 
       if (blockHasMissingValues) {
-        report.push({ schemes: {}, status: 'skipped' });
+        report.push({ ok: false, schemes: {} });
         continue;
       }
 

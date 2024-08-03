@@ -7,8 +7,8 @@ declare module 'fastify' {
   interface FastifyRequest {
     [DECORATOR_NAME]: {
       operation: OpenAPI.OpenAPIV3_1.OperationObject,
-      security: RequestSecurity
-      securityReport: RequestSecurityReportEntry[]
+      security: SecurityData
+      securityReport: SecurityReport
     }
   }
 
@@ -20,11 +20,13 @@ declare module 'fastify' {
   }
 }
 
-export interface RequestSecurity {
+export interface SecurityData {
   [key:string]: any
 }
 
-export interface RequestSecurityReportEntry {
+export type SecurityReport = SecurityReportBlock[]
+
+export interface SecurityReportBlock {
   ok: boolean
   schemes: {
     [key:string]: {
@@ -32,13 +34,6 @@ export interface RequestSecurityReportEntry {
       data?: any
       error?: any
     }
-  }
-}
-
-export interface RequestSecurityReportResult {
-  ok: boolean
-  schemes: {
-    [key:string]: RequestSecurityReportResult
   }
 }
 
