@@ -18,7 +18,7 @@ await fastify.register(openApiRouter, {
         data: {
           user: { name: 'John Doe' }
         },
-        scopes: ['read:pets']
+        scopes: ['pets:read']
       };
     }
   },

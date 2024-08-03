@@ -59,7 +59,7 @@
         },
         "security": [
           {
-            "petstore_auth": ["write:pets", "read:pets"]
+            "petstore_auth": ["pets:write", "pets:read"]
           }
         ],
         "requestBody": {
@@ -85,7 +85,7 @@
         },
         "security": [
           {
-            "petstore_auth": ["write:pets", "read:pets"]
+            "petstore_auth": ["pets:write", "pets:read"]
           }
         ],
         "requestBody": {
@@ -144,7 +144,7 @@
         },
         "security": [
           {
-            "petstore_auth": ["write:pets", "read:pets"]
+            "petstore_auth": ["pets:write", "pets:read"]
           }
         ]
       }
@@ -198,7 +198,7 @@
         },
         "security": [
           {
-            "petstore_auth": ["write:pets", "read:pets"]
+            "petstore_auth": ["pets:write", "pets:read"]
           }
         ],
         "deprecated": true
@@ -250,7 +250,7 @@
         },
         "security": [
           {
-            "petstore_auth": ["write:pets"],
+            "petstore_auth": ["pets:write"],
             "api_key": []
           },
           {
@@ -283,7 +283,7 @@
         },
         "security": [
           {
-            "petstore_auth": ["write:pets", "read:pets"]
+            "petstore_auth": ["pets:write", "pets:read"]
           }
         ],
         "requestBody": {
@@ -341,7 +341,7 @@
         },
         "security": [
           {
-            "petstore_auth": ["write:pets", "read:pets"]
+            "petstore_auth": ["pets:write", "pets:read"]
           }
         ]
       }
@@ -378,7 +378,7 @@
         },
         "security": [
           {
-            "petstore_auth": ["write:pets", "read:pets"]
+            "petstore_auth": ["pets:write", "pets:read"]
           }
         ],
         "requestBody": {
@@ -977,8 +977,8 @@
           "implicit": {
             "authorizationUrl": "http://petstore.swagger.io/oauth/dialog",
             "scopes": {
-              "write:pets": "modify pets in your account",
-              "read:pets": "read your pets"
+              "pets:write": "modify pets in your account",
+              "pets:read": "read your pets"
             }
           }
         }
