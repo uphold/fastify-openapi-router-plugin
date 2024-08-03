@@ -105,7 +105,7 @@ await fastify.register(import('@fastify/fastify-openapi-router-plugin'), {
           operationId: 'getPetById',
           ...
           security: [
-            { OAuth2: ['read:pets'] }
+            { OAuth2: ['pets:read'] }
           ]
         }
       }
@@ -136,7 +136,7 @@ await fastify.register(import('@fastify/fastify-openapi-router-plugin'), {
 ```
 
 > [!TIP]
-> The `scopes` returned by the security handler can contain **wildcards**. For example, if the security handler returns `{ scopes: ['read:*'] }`, the route will be authorized for any security scope that starts with `read:`.
+> The `scopes` returned by the security handler can contain **wildcards**. For example, if the security handler returns `{ scopes: ['pets:*'] }`, the route will be authorized for any security scope that starts with `pets:`.
 
 > [!IMPORTANT]
 > If your specification uses `http` security schemes with `in: cookie`, you must register [@fastify/cookie](https://github.com/fastify/fastify-cookie) before this plugin.
