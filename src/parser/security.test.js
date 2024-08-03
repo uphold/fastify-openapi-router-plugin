@@ -364,12 +364,29 @@ describe('parseSecurity()', () => {
 
     const onRequest = parseSecurity(operation, spec, securityHandlers);
 
-    expect.assertions(2);
+    expect.assertions(3);
 
     await onRequest(request);
 
     expect(securityHandlers.ApiKey).not.toHaveBeenCalled();
     expect(securityHandlers.OAuth2).toHaveBeenCalledTimes(1);
+    expect(request[DECORATOR_NAME].securityReport).toMatchInlineSnapshot(`
+      [
+        {
+          "ok": false,
+          "schemes": {},
+        },
+        {
+          "ok": true,
+          "schemes": {
+            "OAuth2": {
+              "data": "OAuth2 data",
+              "ok": true,
+            },
+          },
+        },
+      ]
+    `);
   });
 
   it('should validate scopes', async () => {
