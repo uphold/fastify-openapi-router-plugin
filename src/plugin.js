@@ -40,11 +40,17 @@ const plugin = async (fastify, options) => {
     route: createRoute(fastify, routes)
   });
 
-  // Decorate request.
-  fastify.decorateRequest(DECORATOR_NAME, {
-    operation: {},
-    security: {},
-    securityReport: []
+  // Avoid decorating the request with reference types.
+  // Any mutation will impact all requests.
+  fastify.decorateRequest(DECORATOR_NAME, null);
+
+  // Instead, decorate each incoming request.
+  fastify.addHook('onRequest', async request => {
+    request[DECORATOR_NAME] = {
+      operation: {},
+      security: {},
+      securityReport: []
+    };
   });
 };
 
