@@ -9,6 +9,7 @@
     "src"
   ],
   "scripts": {
+    "release": "release-it",
     "start": "node --watch ./examples/petstore/app.js",
     "lint": "eslint .",
     "test": "vitest --coverage"
