@@ -519,4 +519,42 @@ describe('parseSecurity()', () => {
       `);
     }
   });
+
+  it('should map security errors by running the supplied mapper', async () => {
+    const request = {
+      [DECORATOR_NAME]: {},
+      headers: {
+        authorization: 'Bearer bearer token'
+      }
+    };
+    const operation = {
+      security: [{ OAuth2: [] }]
+    };
+    const spec = {
+      components: {
+        securitySchemes: {
+          OAuth2: { type: 'oauth2' }
+        }
+      }
+    };
+    const securityHandlers = {
+      OAuth2: vi.fn(() => {
+        throw new Error('OAuth2 error');
+      })
+    };
+    const customError = new Error('Mapped error');
+    const securityErrorMapper = vi.fn(() => customError);
+
+    const onRequest = parseSecurity(operation, spec, securityHandlers, securityErrorMapper);
+
+    expect.assertions(3);
+
+    try {
+      await onRequest(request);
+    } catch (err) {
+      expect(err).toBe(customError);
+      expect(securityErrorMapper).toHaveBeenCalledTimes(1);
+      expect(securityErrorMapper.mock.calls[0][0]).toBeInstanceOf(errors.UnauthorizedError);
+    }
+  });
 });

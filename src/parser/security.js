@@ -4,7 +4,7 @@ import { extractSecuritySchemeValueFromRequest, verifyScopes } from '../utils/se
 import _ from 'lodash-es';
 import pProps from 'p-props';
 
-export const parseSecurity = (operation, spec, securityHandlers) => {
+export const parseSecurity = (operation, spec, securityHandlers, securityErrorMapper) => {
   // Use the operation security if it's defined, otherwise fallback to the spec global security.
   const operationSecurity = operation.security ?? spec.security ?? [];
 
@@ -93,7 +93,9 @@ export const parseSecurity = (operation, spec, securityHandlers) => {
     const lastResult = report[report.length - 1];
 
     if (!lastResult.ok) {
-      throw createUnauthorizedError(report);
+      const error = createUnauthorizedError(report);
+
+      throw securityErrorMapper?.(error) ?? error;
     }
 
     // Otherwise, we can safely use the last result to decorate the request.

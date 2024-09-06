@@ -58,6 +58,7 @@ await fastify.register(import('@fastify/fastify-openapi-router-plugin'), {
 | ------ | ---- | ----------  |
 | `spec` | `string` or `object` | **REQUIRED**. A file path or object of your OpenAPI specification. |
 | `securityHandlers` | `object` | An object containing the security handlers that match [Security Schemes](https://github.com/OAI/OpenAPI-Specification/blob/main/versions/3.1.0.md#security-scheme-object) described in your OpenAPI specification. |
+| `securityErrorMapper` | `function` | A function that allows mapping the default `UnauthorizedError` to a custom error |
 
 #### `spec`
 
@@ -141,6 +142,45 @@ await fastify.register(import('@fastify/fastify-openapi-router-plugin'), {
 > [!IMPORTANT]
 > If your specification uses `http` security schemes with `in: cookie`, you must register [@fastify/cookie](https://github.com/fastify/fastify-cookie) before this plugin.
 
+#### `securityErrorMapper`
+
+The plugin will throw an `UnauthorizedError` when none of the `security` blocks succeed. By default, this error originates a `401` reply with `{ code: 'FST_OAS_UNAUTHORIZED', 'message': 'Unauthorized' }` as the payload. You can override this behavior by leveraging the `securityErrorMapper` option:
+
+```js
+await fastify.register(import('@fastify/fastify-openapi-router-plugin'), {
+  spec: './petstore.json',
+  securityHandlers: {
+    OAuth2: async (request, reply) => {
+      // ...
+    }
+  },
+  securityErrorMapper: (unauthorizedError) => {
+    // Use `unauthorizedError.securityReport` to perform logic and return a custom error.
+    return MyUnauthorizedError();
+  },
+});
+```
+
+The `securityReport` property of the unauthorized error contains an array of objects with the following structure:
+
+```js
+[
+  {
+    ok: false,
+    // Schemes can be an empty object if the security block was skipped due to missing values.
+    schemes: {
+      OAuth2: {
+        ok: false,
+        // Error thrown by the security handler or fastify.oas.errors.ScopesMismatchError if the scopes were not satisfied.
+        error: new Error(),
+      }
+    }
+  }
+]
+```
+
+If you don't define a `securityErrorMapper`, you can still catch the `UnauthorizedError` in your fastify error handler.
+
 ### Decorators
 
 #### `fastify.oas.route(options)`
@@ -167,6 +207,7 @@ fastify.oas.route({
 This object contains all error classes that can be thrown by the plugin:
 
 - `UnauthorizedError`: Thrown when all security schemes verification failed.
+- `ScopesMismatchError`: Thrown when the scopes returned by the security handler do not satisfy the scopes defined in the API operation.
 
 #### `request.oas`
 
@@ -174,7 +215,7 @@ For your convenience, the object `request.oas` is populated with data related to
 
 - `operation` is the raw API operation that activated the Fastify route.
 - `security` is an object where keys are security scheme names and values the returned `data` field from security handlers.
-- `securityReport`: A detailed report of the security verification process. Check the [Error handler](#error-handler) section for more information.
+- `securityReport`: A detailed report of the security verification process. Check the [`securityErrorMapper`](#security-error-mapper) section for more information.
 
 **Example**
 
@@ -203,38 +244,6 @@ fastify.oas.route({
     return getPetById(petId, userId);
   }
 });
-```
-
-### Error handler
-
-The plugin will throw an `UnauthorizedError` when none of the `security` blocks succeed. By default, this error originates a `401` reply with `{ code: 'FST_OAS_UNAUTHORIZED', 'message': 'Unauthorized' }` as the payload. You can override this behavior by registering a fastify error handler:
-
-```js
-fastify.setErrorHandler((error, request, reply) => {
-  if (error instanceof fastify.oas.errors.UnauthorizedError) {
-    // Do something with `error.securityReport` and call `reply` accordingly.
-  }
-
-  // ...
-});
-```
-
-The `securityReport` property contains an array of objects with the following structure:
-
-```js
-[
-  {
-    ok: false,
-    // Schemes can be an empty object if the security block was skipped due to missing values.
-    schemes: {
-      OAuth2: {
-        ok: false,
-        // Error thrown by the security handler or fastify.oas.errors.ScopesMismatchError if the scopes were not satisfied.
-        error: new Error(),
-      }
-    }
-  }
-]
 ```
 
 ## License
