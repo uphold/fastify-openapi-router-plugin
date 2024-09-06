@@ -28,7 +28,7 @@ export const parse = async options => {
           async function (request) {
             request[DECORATOR_NAME].operation = operation;
           },
-          parseSecurity(operation, spec, options.securityHandlers)
+          parseSecurity(operation, spec, options.securityHandlers, options.securityErrorMapper)
         ].filter(Boolean),
         schema: {
           headers: parseParams(operation.parameters, 'header'),

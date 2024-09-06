@@ -47,11 +47,14 @@ export interface RouteOptions extends Omit<FastifyRouteOptions, "method" | "sche
 
 export interface PluginOptions {
   spec?: string | OpenAPI.OpenAPIV3.Document | OpenAPI.OpenAPIV3_1.Document
+  securityErrorMapper: (error: errors.UnauthorizedError) => Error | undefined
   securityHandlers?: {
     [key:string]: SecurityHandler
   }
 }
 
 export const openApiRouterPlugin: FastifyPluginCallback<PluginOptions>
+
+export { errors }
 
 export default openApiRouterPlugin
