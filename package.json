@@ -1,6 +1,6 @@
 {
   "name": "@uphold/fastify-openapi-router-plugin",
-  "version": "0.1.1",
+  "version": "0.2.0",
   "description": "A plugin for Fastify to connect routes with a OpenAPI 3.x specification",
   "main": "./src/index.js",
   "types": "types/index.d.ts",
