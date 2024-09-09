@@ -58,7 +58,7 @@ await fastify.register(import('@fastify/fastify-openapi-router-plugin'), {
 | ------ | ---- | ----------  |
 | `spec` | `string` or `object` | **REQUIRED**. A file path or object of your OpenAPI specification. |
 | `securityHandlers` | `object` | An object containing the security handlers that match [Security Schemes](https://github.com/OAI/OpenAPI-Specification/blob/main/versions/3.1.0.md#security-scheme-object) described in your OpenAPI specification. |
-| `securityErrorMapper` | `function` | A function that allows mapping the default `UnauthorizedError` to a custom error |
+| `securityErrorMapper` | `function` | A function that allows mapping the default `UnauthorizedError` to a custom error. |
 
 #### `spec`
 
