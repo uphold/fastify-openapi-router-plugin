@@ -2,7 +2,7 @@ import { PLUGIN_NAME } from './utils/constants.js';
 import fp from 'fastify-plugin';
 import plugin from './plugin.js';
 
-export { errors } from './errors/index.js';
+export * from './errors/index.js';
 
 export default fp(plugin, {
   fastify: '4.x',
