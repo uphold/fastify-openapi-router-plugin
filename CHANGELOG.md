@@ -1,5 +1,10 @@
 # Changelog
 
+## [v0.3.0](https://github.com/uphold/fastify-openapi-router-plugin/releases/tag/v0.3.0) (2024-09-11)
+- Export all error file exports [\#14](https://github.com/uphold/fastify-openapi-router-plugin/pull/14) ([satazor](https://github.com/satazor))
+- Add missing dot to sentence in README [\#13](https://github.com/uphold/fastify-openapi-router-plugin/pull/13) ([satazor](https://github.com/satazor))
+- Remove extra line in `.release-it.json` [\#12](https://github.com/uphold/fastify-openapi-router-plugin/pull/12) ([satazor](https://github.com/satazor))
+
 ## [v0.2.0](https://github.com/uphold/fastify-openapi-router-plugin/releases/tag/v0.2.0) (2024-09-09)
 - Add `securityErrorMapper` option [\#11](https://github.com/uphold/fastify-openapi-router-plugin/pull/11) ([satazor](https://github.com/satazor))
 
