@@ -4,7 +4,7 @@ import { extractSecuritySchemeValueFromRequest, verifyScopes } from '../utils/se
 import _ from 'lodash-es';
 import pProps from 'p-props';
 
-export const parseSecurity = (operation, spec, securityHandlers, securityErrorMapper) => {
+export const applySecurity = (operation, spec, securityHandlers, securityErrorMapper) => {
   // Use the operation security if it's defined, otherwise fallback to the spec global security.
   const operationSecurity = operation.security ?? spec.security ?? [];
 

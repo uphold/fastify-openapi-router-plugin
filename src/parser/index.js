@@ -1,8 +1,8 @@
 import { DECORATOR_NAME } from '../utils/constants.js';
+import { applyParamsCoercing, parseParams } from './params.js';
+import { applySecurity, validateSecurity } from './security.js';
 import { parseBody } from './body.js';
-import { parseParams } from './params.js';
 import { parseResponse } from './response.js';
-import { parseSecurity, validateSecurity } from './security.js';
 import { parseUrl } from './url.js';
 import { validateSpec } from './spec.js';
 
@@ -28,7 +28,8 @@ export const parse = async options => {
           async function (request) {
             request[DECORATOR_NAME].operation = operation;
           },
-          parseSecurity(operation, spec, options.securityHandlers, options.securityErrorMapper)
+          applySecurity(operation, spec, options.securityHandlers, options.securityErrorMapper),
+          applyParamsCoercing(operation)
         ].filter(Boolean),
         schema: {
           headers: parseParams(operation.parameters, 'header'),

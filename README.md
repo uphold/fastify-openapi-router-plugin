@@ -246,6 +246,22 @@ fastify.oas.route({
 });
 ```
 
+### Caveats
+
+#### Coercing of `parameters`
+
+This plugin configures Fastify to coerce `parameters` to the correct type based on the schema, [style and explode](https://swagger.io/docs/specification/serialization/) keywords defined in the OpenAPI specification. However, there are limitations. Here's an overview:
+
+- Coercing of all primitive types is supported, like `number` and `boolean`.
+- Coercing of `array` types are supported, albeit with limited styles:
+  - Path: simple.
+  - Query: form with exploded enabled or disabled.
+  - Headers: simple.
+  - Cookies: no support.
+- Coercing of `object` types is not supported.
+
+If your API needs improved coercion support, like `object` types or `cookie` parameters, please [fill an issue](https://github.com/uphold/fastify-openapi-router-plugin/issues/new) to discuss the implementation.
+
 ## License
 
 [MIT](./LICENSE)
