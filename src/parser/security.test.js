@@ -1,7 +1,7 @@
 import { DECORATOR_NAME } from '../utils/constants.js';
+import { applySecurity, validateSecurity } from './security.js';
 import { describe, expect, it, vi } from 'vitest';
 import { errors } from '../errors/index.js';
-import { parseSecurity, validateSecurity } from './security.js';
 
 describe('validateSecurity()', () => {
   it('should throw on invalid security handler option', () => {
@@ -85,15 +85,15 @@ describe('validateSecurity()', () => {
   });
 });
 
-describe('parseSecurity()', () => {
+describe('applySecurity()', () => {
   it('should return undefined if no security', async () => {
-    expect(parseSecurity({}, {}, {})).toBeUndefined();
-    expect(parseSecurity({ security: [] }, {}, {})).toBeUndefined();
-    expect(parseSecurity({}, { security: [] }, {})).toBeUndefined();
+    expect(applySecurity({}, {}, {})).toBeUndefined();
+    expect(applySecurity({ security: [] }, {}, {})).toBeUndefined();
+    expect(applySecurity({}, { security: [] }, {})).toBeUndefined();
   });
 
   it('should return undefined if `security` is disabled in operation', async () => {
-    const onRequest = parseSecurity({ security: [] }, { security: [{ OAuth2: [] }] }, {});
+    const onRequest = applySecurity({ security: [] }, { security: [{ OAuth2: [] }] }, {});
 
     expect(onRequest).toBeUndefined();
   });
@@ -125,7 +125,7 @@ describe('parseSecurity()', () => {
       OAuth2: vi.fn(async () => ({ data: 'OAuth2 data', scopes: [] }))
     };
 
-    const onRequest = parseSecurity(operation, spec, securityHandlers);
+    const onRequest = applySecurity(operation, spec, securityHandlers);
 
     await onRequest(request);
 
@@ -180,7 +180,7 @@ describe('parseSecurity()', () => {
       OAuth2: vi.fn(async () => ({ data: 'OAuth2 data', scopes: [] }))
     };
 
-    const onRequest = parseSecurity(operation, spec, securityHandlers);
+    const onRequest = applySecurity(operation, spec, securityHandlers);
 
     await onRequest(request);
 
@@ -241,7 +241,7 @@ describe('parseSecurity()', () => {
       })
     };
 
-    const onRequest = parseSecurity(operation, spec, securityHandlers);
+    const onRequest = applySecurity(operation, spec, securityHandlers);
 
     expect.assertions(2);
 
@@ -296,7 +296,7 @@ describe('parseSecurity()', () => {
       OAuth2: vi.fn(async () => ({ data: 'OAuth2 data', scopes: ['write'] }))
     };
 
-    const onRequest = parseSecurity(operation, spec, securityHandlers);
+    const onRequest = applySecurity(operation, spec, securityHandlers);
 
     await onRequest(request);
 
@@ -327,7 +327,7 @@ describe('parseSecurity()', () => {
       })
     };
 
-    const onRequest = parseSecurity(operation, spec, securityHandlers);
+    const onRequest = applySecurity(operation, spec, securityHandlers);
 
     expect.assertions(2);
 
@@ -362,7 +362,7 @@ describe('parseSecurity()', () => {
       OAuth2: vi.fn(async () => ({ data: 'OAuth2 data', scopes: [] }))
     };
 
-    const onRequest = parseSecurity(operation, spec, securityHandlers);
+    const onRequest = applySecurity(operation, spec, securityHandlers);
 
     expect.assertions(3);
 
@@ -410,7 +410,7 @@ describe('parseSecurity()', () => {
       OAuth2: vi.fn(() => ({ data: 'OAuth2 data', scopes: ['read'] }))
     };
 
-    const onRequest = parseSecurity(operation, spec, securityHandlers);
+    const onRequest = applySecurity(operation, spec, securityHandlers);
 
     expect.assertions(2);
 
@@ -455,7 +455,7 @@ describe('parseSecurity()', () => {
       OAuth2: vi.fn(() => {})
     };
 
-    const onRequest = parseSecurity(operation, spec, securityHandlers);
+    const onRequest = applySecurity(operation, spec, securityHandlers);
 
     await onRequest(request);
 
@@ -496,7 +496,7 @@ describe('parseSecurity()', () => {
       OAuth2: vi.fn(() => {})
     };
 
-    const onRequest = parseSecurity(operation, spec, securityHandlers);
+    const onRequest = applySecurity(operation, spec, securityHandlers);
 
     expect.assertions(2);
 
@@ -545,7 +545,7 @@ describe('parseSecurity()', () => {
     const customError = new Error('Mapped error');
     const securityErrorMapper = vi.fn(() => customError);
 
-    const onRequest = parseSecurity(operation, spec, securityHandlers, securityErrorMapper);
+    const onRequest = applySecurity(operation, spec, securityHandlers, securityErrorMapper);
 
     expect.assertions(3);
 
