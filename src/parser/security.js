@@ -40,7 +40,7 @@ export const applySecurity = (operation, spec, securityHandlers, securityErrorMa
       let promise = promisesCache.get(name);
 
       if (!promise) {
-        promise = new Promise(resolve => resolve(securityHandlers[name](value, request)));
+        promise = new Promise(resolve => resolve(securityHandlers[name](value, request, operation)));
         promisesCache.set(name, promise);
       }
 
@@ -95,7 +95,7 @@ export const applySecurity = (operation, spec, securityHandlers, securityErrorMa
     if (!lastResult.ok) {
       const error = createUnauthorizedError(report);
 
-      throw securityErrorMapper?.(error) ?? error;
+      throw securityErrorMapper?.(error, request, operation) ?? error;
     }
 
     // Otherwise, we can safely use the last result to decorate the request.

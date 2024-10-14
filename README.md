@@ -123,7 +123,7 @@ await fastify.register(import('@fastify/fastify-openapi-router-plugin'), {
     }
   },
   securityHandlers: {
-    OAuth2: async (token, request) => {
+    OAuth2: async (token, request, operation) => {
       // Validate and decode token.
       const { userId } = verifyToken(token);
 
@@ -154,7 +154,7 @@ await fastify.register(import('@fastify/fastify-openapi-router-plugin'), {
       // ...
     }
   },
-  securityErrorMapper: (unauthorizedError) => {
+  securityErrorMapper: (unauthorizedError, request, operation) => {
     // Use `unauthorizedError.securityReport` to perform logic and return a custom error.
     return MyUnauthorizedError();
   },

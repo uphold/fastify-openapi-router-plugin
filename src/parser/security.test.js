@@ -130,9 +130,9 @@ describe('applySecurity()', () => {
     await onRequest(request);
 
     expect(securityHandlers.ApiKey).toHaveBeenCalledTimes(1);
-    expect(securityHandlers.ApiKey).toHaveBeenCalledWith('api key', request);
+    expect(securityHandlers.ApiKey).toHaveBeenCalledWith('api key', request, operation);
     expect(securityHandlers.OAuth2).toHaveBeenCalledTimes(1);
-    expect(securityHandlers.OAuth2).toHaveBeenCalledWith('bearer token', request);
+    expect(securityHandlers.OAuth2).toHaveBeenCalledWith('bearer token', request, operation);
     expect(securityHandlers.ApiKey2).not.toHaveBeenCalled();
     expect(request[DECORATOR_NAME].security).toMatchObject({ ApiKey: 'ApiKey data', OAuth2: 'OAuth2 data' });
     expect(request[DECORATOR_NAME].securityReport).toMatchInlineSnapshot(`
@@ -185,9 +185,9 @@ describe('applySecurity()', () => {
     await onRequest(request);
 
     expect(securityHandlers.ApiKey).toHaveBeenCalledTimes(1);
-    expect(securityHandlers.ApiKey).toHaveBeenCalledWith('api key', request);
+    expect(securityHandlers.ApiKey).toHaveBeenCalledWith('api key', request, operation);
     expect(securityHandlers.OAuth2).toHaveBeenCalledTimes(1);
-    expect(securityHandlers.OAuth2).toHaveBeenCalledWith('bearer token', request);
+    expect(securityHandlers.OAuth2).toHaveBeenCalledWith('bearer token', request, operation);
     expect(request[DECORATOR_NAME].security).toMatchObject({ OAuth2: 'OAuth2 data' });
     expect(request[DECORATOR_NAME].securityReport).toMatchInlineSnapshot(`
       [
@@ -554,7 +554,7 @@ describe('applySecurity()', () => {
     } catch (err) {
       expect(err).toBe(customError);
       expect(securityErrorMapper).toHaveBeenCalledTimes(1);
-      expect(securityErrorMapper.mock.calls[0][0]).toBeInstanceOf(errors.UnauthorizedError);
+      expect(securityErrorMapper).toHaveBeenCalledWith(expect.any(errors.UnauthorizedError), request, operation);
     }
   });
 });
