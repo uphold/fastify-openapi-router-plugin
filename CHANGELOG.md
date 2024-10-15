@@ -1,5 +1,8 @@
 # Changelog
 
+## [v0.5.0](https://github.com/uphold/fastify-openapi-router-plugin/releases/tag/v0.5.0) (2024-10-15)
+- Expose `verifyScopes` [\#19](https://github.com/uphold/fastify-openapi-router-plugin/pull/19) ([satazor](https://github.com/satazor))
+
 ## [v0.4.0](https://github.com/uphold/fastify-openapi-router-plugin/releases/tag/v0.4.0) (2024-09-23)
 - Add parameters coercing [\#16](https://github.com/uphold/fastify-openapi-router-plugin/pull/16) ([satazor](https://github.com/satazor))
 - Bump vite from 5.3.5 to 5.4.6 [\#15](https://github.com/uphold/fastify-openapi-router-plugin/pull/15) ([dependabot](https://github.com/apps/dependabot))
