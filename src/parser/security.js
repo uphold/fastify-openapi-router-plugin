@@ -1,5 +1,5 @@
 import { DECORATOR_NAME } from '../utils/constants.js';
-import { createUnauthorizedError } from '../errors/index.js';
+import { createScopesMismatchError, createUnauthorizedError } from '../errors/index.js';
 import { extractSecuritySchemeValueFromRequest, verifyScopes } from '../utils/security.js';
 import _ from 'lodash-es';
 import pProps from 'p-props';
@@ -66,10 +66,14 @@ export const applySecurity = (operation, spec, securityHandlers, securityErrorMa
       const blockResults = await pProps(block, async (requiredScopes, name) => {
         try {
           const resolved = await callSecurityHandler(name);
-          const { data, scopes } = resolved ?? {};
+          const { data, scopes: providedScopes = [] } = resolved ?? {};
 
-          // Verify scopes, which throws if scopes are missing.
-          verifyScopes(scopes ?? [], requiredScopes);
+          // Verify scopes to check if any is missing.
+          const missingScopes = verifyScopes(providedScopes, requiredScopes);
+
+          if (missingScopes.length > 0) {
+            throw createScopesMismatchError(providedScopes, requiredScopes, missingScopes);
+          }
 
           return { data, ok: true };
         } catch (error) {

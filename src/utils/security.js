@@ -1,5 +1,3 @@
-import { createScopesMismatchError } from '../errors/index.js';
-
 const getValueForHttpSchemeType = (request, securityScheme) => {
   if (securityScheme.scheme === 'bearer') {
     const [, bearer] = request.headers.authorization?.match(/^Bearer (.+)$/i) ?? [];
@@ -74,7 +72,5 @@ export const verifyScopes = (providedScopes, requiredScopes) => {
     return !hasMatchingScope;
   });
 
-  if (missingScopes.length > 0) {
-    throw createScopesMismatchError(providedScopes, requiredScopes, missingScopes);
-  }
+  return missingScopes;
 };
