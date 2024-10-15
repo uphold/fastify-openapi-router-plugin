@@ -1,26 +1,12 @@
 import { describe, expect, it } from 'vitest';
-import { errors } from '../errors/index';
 import { extractSecuritySchemeValueFromRequest, verifyScopes } from './security';
 import _ from 'lodash-es';
 
 describe('verifyScopes()', () => {
   const runTest = ({ missing, provided, required }) => {
-    try {
-      verifyScopes(provided, required);
+    const result = verifyScopes(provided, required);
 
-      if (missing.length > 0) {
-        throw new Error('Expected an error to be thrown');
-      }
-    } catch (err) {
-      expect(err).toBeInstanceOf(errors.ScopesMismatchError);
-      expect(err).toMatchObject({
-        scopes: {
-          missing: missing,
-          provided: provided,
-          required: required
-        }
-      });
-    }
+    expect(result).toStrictEqual(missing);
   };
 
   it('should verify regular scopes correctly against required scopes', async () => {

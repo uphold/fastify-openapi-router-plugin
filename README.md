@@ -137,7 +137,7 @@ await fastify.register(import('@fastify/fastify-openapi-router-plugin'), {
 ```
 
 > [!TIP]
-> The `scopes` returned by the security handler can contain **wildcards**. For example, if the security handler returns `{ scopes: ['pets:*'] }`, the route will be authorized for any security scope that starts with `pets:`.
+> The `scopes` returned by the security handler can contain trailing **wildcards**. For example, if the security handler returns `{ scopes: ['pets:*'] }`, the route will be authorized for any security scope that starts with `pets:`.
 
 > [!IMPORTANT]
 > If your specification uses `http` security schemes with `in: cookie`, you must register [@fastify/cookie](https://github.com/fastify/fastify-cookie) before this plugin.
@@ -245,6 +245,18 @@ fastify.oas.route({
   }
 });
 ```
+
+### Other exports
+
+#### `errors`
+
+This object contains all error classes that can be thrown by the plugin. It contains the same errors as `fastify.oas.errors`.
+
+#### `verifyScopes(providedScopes, requiredScopes)`
+
+Checks if the `providedScopes` satisfy the `requiredScopes`. Returns an array of missing scopes or an empty array if all scopes are satisfied.
+
+This functions supports trailing **wildcards** on `providedScopes`. For example, if the provided scopes is `['pets:*']` and the required scopes is `['pets:read']`, the function will return an empty array.
 
 ### Caveats
 
