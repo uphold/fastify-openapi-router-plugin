@@ -1,5 +1,8 @@
 # Changelog
 
+## [v0.5.2](https://github.com/uphold/fastify-openapi-router-plugin/releases/tag/v0.5.2) (2024-10-24)
+- Remove only `discriminator.mapping` [\#22](https://github.com/uphold/fastify-openapi-router-plugin/pull/22) ([satazor](https://github.com/satazor))
+
 ## [v0.5.1](https://github.com/uphold/fastify-openapi-router-plugin/releases/tag/v0.5.1) (2024-10-24)
 - Remove `discriminator` from body [\#21](https://github.com/uphold/fastify-openapi-router-plugin/pull/21) ([satazor](https://github.com/satazor))
 
