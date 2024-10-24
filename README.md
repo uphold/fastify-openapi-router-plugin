@@ -274,6 +274,22 @@ This plugin configures Fastify to coerce `parameters` to the correct type based 
 
 If your API needs improved coercion support, like `object` types or `cookie` parameters, please [fill an issue](https://github.com/uphold/fastify-openapi-router-plugin/issues/new) to discuss the implementation.
 
+#### Using `discriminator`
+
+This plugin removes `discriminator.mapping` from schemas since `ajv` (fastify's validator) does not support it. However, to use `discriminator` in your OpenAPI schema, you must also enable `discriminator` option during fastify initialization like so:
+
+```js
+import Fastify from 'fastify'
+
+const fastify = Fastify({
+  ajv: {
+    customOptions: {
+      discriminator: true
+    }
+  }
+});
+```
+
 ## License
 
 [MIT](./LICENSE)
