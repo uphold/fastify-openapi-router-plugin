@@ -71,8 +71,18 @@ describe('parseBody()', () => {
 
   it('should sanitize body schema', () => {
     const schema = {
-      bar: { discriminator: { propertyName: 'type' }, type: 'object' },
-      foo: { example: 'baz', type: 'string', xml: { name: 'foo' } },
+      bar: {
+        discriminator: {
+          mapping: { bar: 'baz', foo: 'foz' },
+          propertyName: 'type'
+        },
+        type: 'object'
+      },
+      foo: {
+        example: 'baz',
+        type: 'string',
+        xml: { name: 'foo' }
+      },
       required: ['foo'],
       xml: { name: 'Bar' }
     };
@@ -85,7 +95,10 @@ describe('parseBody()', () => {
     parseBody(route, { requestBody });
 
     expect(route.schema.body).toStrictEqual({
-      bar: { type: 'object' },
+      bar: {
+        discriminator: { propertyName: 'type' },
+        type: 'object'
+      },
       foo: { type: 'string' },
       required: ['foo']
     });

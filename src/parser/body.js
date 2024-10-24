@@ -12,7 +12,7 @@ export const parseBody = (route, operation) => {
   addPropertyToSchema(route.schema.headers, { 'content-type': { const: contentType } }, true);
 
   // Sanitize schema.
-  removeAttributesFromSchema(schema, ['xml', 'example', 'discriminator']);
+  removeAttributesFromSchema(schema, ['xml', 'example', 'discriminator.mapping']);
 
   // Add request body schema.
   route.schema.body = schema;

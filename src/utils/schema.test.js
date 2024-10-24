@@ -107,6 +107,13 @@ describe('removeAttributesFromSchema()', () => {
           }
         },
         foo: {
+          discriminator: {
+            mapping: {
+              bar: 'baz',
+              foo: 'foz'
+            },
+            propertyName: 'type'
+          },
           example: 'approved',
           type: 'string'
         }
@@ -115,7 +122,7 @@ describe('removeAttributesFromSchema()', () => {
       xml: { name: 'xml-schema' }
     };
 
-    removeAttributesFromSchema(schema, ['xml', 'example']);
+    removeAttributesFromSchema(schema, ['xml', 'example', 'discriminator.mapping']);
 
     expect(schema).toStrictEqual({
       properties: {
@@ -126,6 +133,7 @@ describe('removeAttributesFromSchema()', () => {
           type: 'string'
         },
         foo: {
+          discriminator: { propertyName: 'type' },
           type: 'string'
         }
       },

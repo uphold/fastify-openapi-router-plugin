@@ -1,3 +1,5 @@
+import { unset } from 'lodash-es';
+
 export const addPropertyToSchema = (schema, properties, required) => {
   for (const key in properties) {
     const property = properties[key];
@@ -19,10 +21,12 @@ export const removeAttributesFromSchema = (schema, attributes) => {
     return;
   }
 
+  for (const attribute of attributes) {
+    unset(schema, attribute);
+  }
+
   for (const prop in schema) {
-    if (attributes.includes(prop)) {
-      delete schema[prop];
-    } else if (typeof schema[prop] === 'object') {
+    if (typeof schema[prop] === 'object') {
       removeAttributesFromSchema(schema[prop], attributes);
     }
   }
