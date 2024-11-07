@@ -6,6 +6,6 @@ export * from './errors/index.js';
 export { verifyScopes } from './utils/security.js';
 
 export default fp(plugin, {
-  fastify: '4.x',
+  fastify: '4.x||5.x',
   name: PLUGIN_NAME
 });
