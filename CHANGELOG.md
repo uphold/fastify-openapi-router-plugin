@@ -1,5 +1,8 @@
 # Changelog
 
+## [v0.6.0](https://github.com/uphold/fastify-openapi-router-plugin/releases/tag/v0.6.0) (2024-11-07)
+- Add support for fastify 5 [\#23](https://github.com/uphold/fastify-openapi-router-plugin/pull/23) ([elpinho](https://github.com/elpinho))
+
 ## [v0.5.2](https://github.com/uphold/fastify-openapi-router-plugin/releases/tag/v0.5.2) (2024-10-24)
 - Remove only `discriminator.mapping` [\#22](https://github.com/uphold/fastify-openapi-router-plugin/pull/22) ([satazor](https://github.com/satazor))
 
