@@ -1,5 +1,9 @@
 # Changelog
 
+## [v0.7.0](https://github.com/uphold/fastify-openapi-router-plugin/releases/tag/v0.7.0) (2025-01-22)
+- Abort by default if a security handler throws an error [\#25](https://github.com/uphold/fastify-openapi-router-plugin/pull/25) ([satazor](https://github.com/satazor))
+- Add types to `files` in package.json [\#24](https://github.com/uphold/fastify-openapi-router-plugin/pull/24) ([satazor](https://github.com/satazor))
+
 ## [v0.6.0](https://github.com/uphold/fastify-openapi-router-plugin/releases/tag/v0.6.0) (2024-11-07)
 - Add support for fastify 5 [\#23](https://github.com/uphold/fastify-openapi-router-plugin/pull/23) ([elpinho](https://github.com/elpinho))
 
