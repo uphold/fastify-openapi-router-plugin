@@ -1,7 +1,17 @@
 import { DECORATOR_NAME } from '../utils/constants.js';
+import { SecurityHandlerError } from '../errors/security-handler-error.js';
 import { applySecurity, validateSecurity } from './security.js';
+import { createSecurityHandlerError, errors } from '../errors/index.js';
 import { describe, expect, it, vi } from 'vitest';
-import { errors } from '../errors/index.js';
+
+expect.addSnapshotSerializer({
+  serialize(val, config, indentation, depth, refs, printer) {
+    val.cause.message = `${val.message}: ${val.cause.message}`;
+
+    return printer(val.cause, config, indentation, depth, refs);
+  },
+  test: val => val instanceof SecurityHandlerError
+});
 
 describe('validateSecurity()', () => {
   it('should throw on invalid security handler option', () => {
@@ -154,7 +164,66 @@ describe('applySecurity()', () => {
     `);
   });
 
-  it('should try second security block if the first one fails', async () => {
+  it('should try second security block if the first one fails with a non-fatal error', async () => {
+    const request = {
+      [DECORATOR_NAME]: {},
+      headers: {
+        'X-API-KEY': 'api key',
+        authorization: 'Bearer bearer token'
+      }
+    };
+    const operation = {
+      security: [{ ApiKey: [] }, { OAuth2: [] }]
+    };
+    const spec = {
+      components: {
+        securitySchemes: {
+          ApiKey: { in: 'header', name: 'X-API-KEY', type: 'apiKey' },
+          OAuth2: { type: 'oauth2' }
+        }
+      }
+    };
+    const securityHandlers = {
+      ApiKey: vi.fn(() => {
+        throw createSecurityHandlerError(new Error('ApiKey error'), false);
+      }),
+      OAuth2: vi.fn(async () => ({ data: 'OAuth2 data', scopes: [] }))
+    };
+
+    const onRequest = applySecurity(operation, spec, securityHandlers);
+
+    await onRequest(request);
+
+    expect(securityHandlers.ApiKey).toHaveBeenCalledTimes(1);
+    expect(securityHandlers.ApiKey).toHaveBeenCalledWith('api key', request);
+    expect(securityHandlers.OAuth2).toHaveBeenCalledTimes(1);
+    expect(securityHandlers.OAuth2).toHaveBeenCalledWith('bearer token', request);
+    expect(request[DECORATOR_NAME].security).toMatchObject({ OAuth2: 'OAuth2 data' });
+    expect(request[DECORATOR_NAME].securityReport).toMatchInlineSnapshot(`
+      [
+        {
+          "ok": false,
+          "schemes": {
+            "ApiKey": {
+              "error": [Error: Security handler has thrown an error: ApiKey error],
+              "ok": false,
+            },
+          },
+        },
+        {
+          "ok": true,
+          "schemes": {
+            "OAuth2": {
+              "data": "OAuth2 data",
+              "ok": true,
+            },
+          },
+        },
+      ]
+    `);
+  });
+
+  it('should stop when a security block fails with a fatal error', async () => {
     const request = {
       [DECORATOR_NAME]: {},
       headers: {
@@ -182,35 +251,24 @@ describe('applySecurity()', () => {
 
     const onRequest = applySecurity(operation, spec, securityHandlers);
 
-    await onRequest(request);
-
-    expect(securityHandlers.ApiKey).toHaveBeenCalledTimes(1);
-    expect(securityHandlers.ApiKey).toHaveBeenCalledWith('api key', request);
-    expect(securityHandlers.OAuth2).toHaveBeenCalledTimes(1);
-    expect(securityHandlers.OAuth2).toHaveBeenCalledWith('bearer token', request);
-    expect(request[DECORATOR_NAME].security).toMatchObject({ OAuth2: 'OAuth2 data' });
-    expect(request[DECORATOR_NAME].securityReport).toMatchInlineSnapshot(`
-      [
-        {
-          "ok": false,
-          "schemes": {
-            "ApiKey": {
-              "error": [Error: ApiKey error],
-              "ok": false,
+    try {
+      await onRequest(request);
+    } catch (error) {
+      expect(error).toBeInstanceOf(errors.UnauthorizedError);
+      expect(error.securityReport).toMatchInlineSnapshot(`
+        [
+          {
+            "ok": false,
+            "schemes": {
+              "ApiKey": {
+                "error": [Error: Security handler has thrown an error: ApiKey error],
+                "ok": false,
+              },
             },
           },
-        },
-        {
-          "ok": true,
-          "schemes": {
-            "OAuth2": {
-              "data": "OAuth2 data",
-              "ok": true,
-            },
-          },
-        },
-      ]
-    `);
+        ]
+      `);
+    }
   });
 
   it('should throw an error if all security blocks fail', async () => {
@@ -234,10 +292,10 @@ describe('applySecurity()', () => {
     };
     const securityHandlers = {
       ApiKey: vi.fn(() => {
-        throw new Error('ApiKey error');
+        throw createSecurityHandlerError(new Error('ApiKey error'), false);
       }),
       OAuth2: vi.fn(() => {
-        throw new Error('OAuth2 error');
+        throw createSecurityHandlerError(new Error('OAuth2 error'), false);
       })
     };
 
@@ -255,7 +313,7 @@ describe('applySecurity()', () => {
             "ok": false,
             "schemes": {
               "ApiKey": {
-                "error": [Error: ApiKey error],
+                "error": [Error: Security handler has thrown an error: ApiKey error],
                 "ok": false,
               },
             },
@@ -264,7 +322,7 @@ describe('applySecurity()', () => {
             "ok": false,
             "schemes": {
               "OAuth2": {
-                "error": [Error: OAuth2 error],
+                "error": [Error: Security handler has thrown an error: OAuth2 error],
                 "ok": false,
               },
             },
