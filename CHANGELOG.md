@@ -1,5 +1,10 @@
 # Changelog
 
+## [v0.7.1](https://github.com/uphold/fastify-openapi-router-plugin/releases/tag/v0.7.1) (2025-01-22)
+- Fix typescript types [\#26](https://github.com/uphold/fastify-openapi-router-plugin/pull/26) ([satazor](https://github.com/satazor))
+- Bump rollup from 4.21.3 to 4.22.4 [\#17](https://github.com/uphold/fastify-openapi-router-plugin/pull/17) ([dependabot](https://github.com/apps/dependabot))
+- Bump cookie and light-my-request [\#20](https://github.com/uphold/fastify-openapi-router-plugin/pull/20) ([dependabot](https://github.com/apps/dependabot))
+
 ## [v0.7.0](https://github.com/uphold/fastify-openapi-router-plugin/releases/tag/v0.7.0) (2025-01-22)
 - Abort by default if a security handler throws an error [\#25](https://github.com/uphold/fastify-openapi-router-plugin/pull/25) ([satazor](https://github.com/satazor))
 - Add types to `files` in package.json [\#24](https://github.com/uphold/fastify-openapi-router-plugin/pull/24) ([satazor](https://github.com/satazor))
