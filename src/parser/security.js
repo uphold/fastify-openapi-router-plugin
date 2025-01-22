@@ -1,5 +1,6 @@
 import { DECORATOR_NAME } from '../utils/constants.js';
-import { createScopesMismatchError, createUnauthorizedError } from '../errors/index.js';
+import { SecurityHandlerError } from '../errors/security-handler-error.js';
+import { createScopesMismatchError, createSecurityHandlerError, createUnauthorizedError } from '../errors/index.js';
 import { extractSecuritySchemeValueFromRequest, verifyScopes } from '../utils/security.js';
 import _ from 'lodash-es';
 import pProps from 'p-props';
@@ -44,7 +45,17 @@ export const applySecurity = (operation, spec, securityHandlers, securityErrorMa
         promisesCache.set(name, promise);
       }
 
-      return await promise;
+      try {
+        return await promise;
+      } catch (error) {
+        let handlerError = error;
+
+        if (!(handlerError instanceof SecurityHandlerError)) {
+          handlerError = createSecurityHandlerError(error, true);
+        }
+
+        throw handlerError;
+      }
     };
 
     // Iterate over each security on the array, calling each one a `block`.
@@ -62,7 +73,7 @@ export const applySecurity = (operation, spec, securityHandlers, securityErrorMa
       }
 
       // Iterate over each security scheme in the block and call the security handler.
-      // We leverage cache when calling the handler to avoid multiple calls to the same function
+      // We leverage cache when calling the handler to avoid multiple calls to the same function.
       const blockResults = await pProps(block, async (requiredScopes, name) => {
         try {
           const resolved = await callSecurityHandler(name);
@@ -83,11 +94,15 @@ export const applySecurity = (operation, spec, securityHandlers, securityErrorMa
 
       // Requirements in a block are AND'd together.
       const ok = Object.values(blockResults).every(result => result.ok);
+      const fatal = Object.values(blockResults).some(
+        result => result.error instanceof SecurityHandlerError && result.error.fatal
+      );
 
       report.push({ ok, schemes: blockResults });
 
       // Blocks themselves are OR'd together, so we can break early if one block passes.
-      if (ok) {
+      // If a fatal error is found in a block, we can break early as well.
+      if (ok || fatal) {
         break;
       }
     }

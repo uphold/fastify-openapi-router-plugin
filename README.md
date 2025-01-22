@@ -136,6 +136,8 @@ await fastify.register(import('@fastify/fastify-openapi-router-plugin'), {
 });
 ```
 
+Any error thrown by the security handler will be internally wrapped in a `SecurityHandlerError` with `fatal = true`, which will stop further security blocks to be executed. If you wish to continue with the next security block, you can `throw createSecurityHandlerError(error, false)` in your handler.
+
 > [!TIP]
 > The `scopes` returned by the security handler can contain trailing **wildcards**. For example, if the security handler returns `{ scopes: ['pets:*'] }`, the route will be authorized for any security scope that starts with `pets:`.
 
@@ -171,8 +173,8 @@ The `securityReport` property of the unauthorized error contains an array of obj
     schemes: {
       OAuth2: {
         ok: false,
-        // Error thrown by the security handler or fastify.oas.errors.ScopesMismatchError if the scopes were not satisfied.
-        error: new Error(),
+        // The error will be either be a `fastify.oas.errors.SecurityHandlerError` or a `fastify.oas.errors.ScopesMismatchError` if the scopes were not satisfied.
+        error: <Error>,
       }
     }
   }
