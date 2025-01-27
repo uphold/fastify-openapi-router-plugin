@@ -59,6 +59,7 @@ await fastify.register(import('@fastify/fastify-openapi-router-plugin'), {
 | `spec` | `string` or `object` | **REQUIRED**. A file path or object of your OpenAPI specification. |
 | `securityHandlers` | `object` | An object containing the security handlers that match [Security Schemes](https://github.com/OAI/OpenAPI-Specification/blob/main/versions/3.1.0.md#security-scheme-object) described in your OpenAPI specification. |
 | `securityErrorMapper` | `function` | A function that allows mapping the default `UnauthorizedError` to a custom error. |
+| `notImplementedErrorMapper` | `function` | A function that allows mapping the default `NotImplementedError` to a custom error. |
 
 #### `spec`
 
@@ -146,7 +147,7 @@ Any error thrown by the security handler will be internally wrapped in a `Securi
 
 #### `securityErrorMapper`
 
-The plugin will throw an `UnauthorizedError` when none of the `security` blocks succeed. By default, this error originates a `401` reply with `{ code: 'FST_OAS_UNAUTHORIZED', 'message': 'Unauthorized' }` as the payload. You can override this behavior by leveraging the `securityErrorMapper` option:
+The plugin will throw an `UnauthorizedError` when none of the `security` blocks succeed. By default, this error originates a `401` reply with `{ code: 'FST_OAS_UNAUTHORIZED', message: 'Unauthorized' }` as the payload. You can override this behavior by leveraging the `securityErrorMapper` option:
 
 ```js
 await fastify.register(import('@fastify/fastify-openapi-router-plugin'), {
@@ -184,6 +185,21 @@ The `securityReport` property of the unauthorized error contains an array of obj
 
 If you don't define a `securityErrorMapper`, you can still catch the `UnauthorizedError` in your fastify error handler.
 
+#### `notImplementedErrorMapper`
+
+The plugin will throw an `NotImplementedError` when you install a handler for not implemented specs through `fastify.oas.installNotImplementedRoutes()` function. By default, this error originates a `501` reply with `{ code: 'FST_OAS_NOT_IMPLEMENTED', message: 'Not implemented' }` as the payload. You can override this behavior by leveraging the `notImplementedErrorMapper` option:
+
+```js
+await fastify.register(import('@fastify/fastify-openapi-router-plugin'), {
+  spec: './petstore.json',
+  notImplementedErrorMapper: (notImplementedError) => {
+    return MyNotImplementedError();
+  },
+});
+```
+
+If you don't define a `notImplementedErrorMapper`, you can still catch the `NotImplementedError` in your fastify error handler.
+
 ### Decorators
 
 #### `fastify.oas.route(options)`
@@ -205,13 +221,42 @@ fastify.oas.route({
 });
 ```
 
+#### `fastify.oas.installNotImplementedRoutes()`
+
+This function will register handlers with fastify for the routes in the spec that were not registered. You can use this, for example, when you want to give a more specific error for the consumer for operations that you still do not have an implementation.
+
+> [!IMPORTANT]
+> Make sure you `await` the calls to `fastify.register()` for your routes before calling this function to make sure that fastify executes them before the call to `fastify.oas.installNotImplementedRoutes()`.
+
+**Example**
+
+```js
+await fastify.register(import('@fastify/fastify-openapi-router-plugin'), {
+  spec: './petstore.json'
+});
+
+fastify.oas.route({
+  operationId: 'getPetById',
+  handler: (request, reply) => {}
+});
+
+// Routes in spec that were not registered through `fastify.oas.route` will get a 'not implemented' handler.
+fastify.oas.installNotImplementedRoutes();
+
+// Finish fastify setup.
+await fastify.ready();
+```
+
+> [!TIP]
+> If you need to customize the `NotImplementedError` that is thrown by default, you can use the [notImplementedErrorMapper](#notimplementederrormapper) in order to change the default behavior.
+
 #### `fastify.oas.errors`
 
 This object contains all error classes used by the plugin:
 
 - `SecurityHandlerError`: Used to wrap a security handler error.
 - `ScopesMismatchError`: Used when the scopes returned by the security handler do not satisfy the scopes defined in the API operation.
-- `UnauthorizedError`: Used to indicate that the request is unauthorized, containing a `securityReport`. Check the [`securityErrorMapper`](#security-error-mapper) section for more information.
+- `UnauthorizedError`: Used to indicate that the request is unauthorized, containing a `securityReport`. Check the [`securityErrorMapper`](#securityerrormapper) section for more information.
 
 #### `request.oas`
 
@@ -219,7 +264,7 @@ For your convenience, the object `request.oas` is populated with data related to
 
 - `operation` is the raw API operation that activated the Fastify route.
 - `security` is an object where keys are security scheme names and values the returned `data` field from security handlers.
-- `securityReport`: A detailed report of the security verification process. Check the [`securityErrorMapper`](#security-error-mapper) section for more information.
+- `securityReport`: A detailed report of the security verification process. Check the [`securityErrorMapper`](#securityerrormapper) section for more information.
 
 **Example**
 

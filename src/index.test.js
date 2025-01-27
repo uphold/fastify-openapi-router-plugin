@@ -13,6 +13,9 @@ describe('Fastify plugin', () => {
         '/pets': {
           get: {
             operationId: 'getPets'
+          },
+          post: {
+            operationId: 'postPets'
           }
         }
       }
@@ -46,48 +49,119 @@ describe('Fastify plugin', () => {
     });
   });
 
-  it('should throw registering a route if `operationId` is not in spec', async () => {
-    const app = fastify({ logger: false });
+  describe('route()', () => {
+    it('should throw registering a route if `operationId` is not in spec', async () => {
+      const app = fastify({ logger: false });
 
-    await app.register(OpenAPIRouter, { spec });
+      await app.register(OpenAPIRouter, { spec });
 
-    expect(() =>
-      app.oas.route({
-        handler: () => {},
-        operationId: 'getUnknown'
-      })
-    ).toThrowError(`Missing 'getUnknown' in OpenAPI spec.`);
-  });
-
-  it('should set a route-level onRequest hook', async () => {
-    const app = fastify({ logger: false });
-    const onRequest = vi.fn(async () => {});
-
-    await app.register(OpenAPIRouter, { spec });
-
-    app.oas.route({
-      handler: async () => {},
-      onRequest,
-      operationId: 'getPets'
+      expect(() =>
+        app.oas.route({
+          handler: () => {},
+          operationId: 'getUnknown'
+        })
+      ).toThrowError(`Missing 'getUnknown' in OpenAPI spec.`);
     });
 
-    await app.inject({ url: '/pets' });
+    it('should set a route-level onRequest hook', async () => {
+      const app = fastify({ logger: false });
+      const onRequest = vi.fn(async () => {});
 
-    expect(onRequest).toHaveBeenCalledTimes(1);
-  });
+      await app.register(OpenAPIRouter, { spec });
 
-  it('should not override internal route options', async () => {
-    const app = fastify({ logger: false });
-
-    await app.register(OpenAPIRouter, { spec });
-
-    expect(() =>
       app.oas.route({
         handler: async () => {},
-        method: 'PUT',
-        operationId: 'getPets',
-        url: '/pets/:id'
-      })
-    ).toThrowError(`Not allowed to override 'method', 'schema' or 'url' for operation 'getPets'.`);
+        onRequest,
+        operationId: 'getPets'
+      });
+
+      await app.inject({ url: '/pets' });
+
+      expect(onRequest).toHaveBeenCalledTimes(1);
+    });
+
+    it('should not override internal route options', async () => {
+      const app = fastify({ logger: false });
+
+      await app.register(OpenAPIRouter, { spec });
+
+      expect(() =>
+        app.oas.route({
+          handler: async () => {},
+          method: 'PUT',
+          operationId: 'getPets',
+          url: '/pets/:id'
+        })
+      ).toThrowError(`Not allowed to override 'method', 'schema' or 'url' for operation 'getPets'.`);
+    });
+  });
+
+  describe('installNotImplementedRoutes()', () => {
+    it('should install handlers for not registered routes that will return a not implemented error', async () => {
+      const app = fastify({ logger: false });
+
+      await app.register(OpenAPIRouter, { spec });
+
+      app.oas.route({
+        handler: async () => {
+          return 'pets';
+        },
+        operationId: 'getPets'
+      });
+
+      vi.spyOn(app, 'route');
+
+      app.oas.installNotImplementedRoutes();
+
+      expect(app.route).toHaveBeenCalledWith({
+        handler: expect.any(Function),
+        method: 'POST',
+        onRequest: [expect.any(Function)],
+        schema: {
+          headers: {
+            properties: {},
+            required: [],
+            type: 'object'
+          },
+          params: {
+            properties: {},
+            required: [],
+            type: 'object'
+          },
+          query: {
+            properties: {},
+            required: [],
+            type: 'object'
+          },
+          response: {}
+        },
+        url: '/pets'
+      });
+
+      const getPetsResult = await app.inject({ url: '/pets' });
+
+      expect(getPetsResult.body).toMatchInlineSnapshot('"pets"');
+
+      const postPetsResult = await app.inject({ method: 'POST', url: '/pets' });
+
+      expect(postPetsResult.body).toMatchInlineSnapshot(
+        `"{"statusCode":501,"code":"FST_OAS_NOT_IMPLEMENTED","error":"Not Implemented","message":"Not implemented"}"`
+      );
+    });
+
+    it('should call `notImplementedErrorMapper` option if provided', async () => {
+      const app = fastify({ logger: false });
+      const notImplementedErrorMapper = vi.fn(() => new Error('Foo'));
+
+      await app.register(OpenAPIRouter, { notImplementedErrorMapper, spec });
+
+      app.oas.installNotImplementedRoutes();
+
+      const postPetsResult = await app.inject({ method: 'POST', url: '/pets' });
+
+      expect(postPetsResult.body).toMatchInlineSnapshot(
+        `"{"statusCode":500,"error":"Internal Server Error","message":"Foo"}"`
+      );
+    });
   });
 });
