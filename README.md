@@ -173,7 +173,8 @@ The `securityReport` property of the unauthorized error contains an array of obj
     schemes: {
       OAuth2: {
         ok: false,
-        // The error will be either be a `fastify.oas.errors.SecurityHandlerError` or a `fastify.oas.errors.ScopesMismatchError` if the scopes were not satisfied.
+        // The error will be either be a `fastify.oas.errors.SecurityHandlerError` or a
+        // `fastify.oas.errors.ScopesMismatchError` if the scopes were not satisfied.
         error: <Error>,
       }
     }
@@ -206,10 +207,11 @@ fastify.oas.route({
 
 #### `fastify.oas.errors`
 
-This object contains all error classes that can be thrown by the plugin:
+This object contains all error classes used by the plugin:
 
-- `UnauthorizedError`: Thrown when all security schemes verification failed.
-- `ScopesMismatchError`: Thrown when the scopes returned by the security handler do not satisfy the scopes defined in the API operation.
+- `SecurityHandlerError`: Used to wrap a security handler error.
+- `ScopesMismatchError`: Used when the scopes returned by the security handler do not satisfy the scopes defined in the API operation.
+- `UnauthorizedError`: Used to indicate that the request is unauthorized, containing a `securityReport`. Check the [`securityErrorMapper`](#security-error-mapper) section for more information.
 
 #### `request.oas`
 
