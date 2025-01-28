@@ -1,5 +1,10 @@
 # Changelog
 
+## [v0.8.0](https://github.com/uphold/fastify-openapi-router-plugin/releases/tag/v0.8.0) (2025-01-28)
+- Add mechanism to install not implemented routes [\#29](https://github.com/uphold/fastify-openapi-router-plugin/pull/29) ([boliveira](https://github.com/boliveira))
+- Bump vite from 5.4.6 to 5.4.14 [\#27](https://github.com/uphold/fastify-openapi-router-plugin/pull/27) ([dependabot](https://github.com/apps/dependabot))
+- Improve errors in README [\#28](https://github.com/uphold/fastify-openapi-router-plugin/pull/28) ([satazor](https://github.com/satazor))
+
 ## [v0.7.1](https://github.com/uphold/fastify-openapi-router-plugin/releases/tag/v0.7.1) (2025-01-22)
 - Fix typescript types [\#26](https://github.com/uphold/fastify-openapi-router-plugin/pull/26) ([satazor](https://github.com/satazor))
 - Bump rollup from 4.21.3 to 4.22.4 [\#17](https://github.com/uphold/fastify-openapi-router-plugin/pull/17) ([dependabot](https://github.com/apps/dependabot))
