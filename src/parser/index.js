@@ -21,16 +21,20 @@ export const parse = async options => {
     for (const method in methods) {
       const operation = methods[method];
 
+      const securityFn = applySecurity(operation, spec, options.securityHandlers, options.securityErrorMapper);
+      const applyParamsCoercingFn = applyParamsCoercing(operation);
+
       // Build fastify route.
       const route = {
         method: method.toUpperCase(),
         onRequest: [
-          async function (request) {
+          async function openApiRouterOnRequestHook(request) {
             request[DECORATOR_NAME].operation = operation;
-          },
-          applySecurity(operation, spec, options.securityHandlers, options.securityErrorMapper),
-          applyParamsCoercing(operation)
-        ].filter(Boolean),
+
+            await securityFn?.(request);
+            applyParamsCoercingFn?.(request);
+          }
+        ],
         schema: {
           headers: parseParams(operation.parameters, 'header'),
           params: parseParams(operation.parameters, 'path'),

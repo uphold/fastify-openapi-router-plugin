@@ -44,6 +44,8 @@ const createRoute = (fastify, routes, notImplementedErrorMapper) => {
     // Check if there is a routeOptions.onRequest hook.
     if (typeof onRequest === 'function') {
       route.onRequest.push(onRequest);
+    } else if (Array.isArray(onRequest)) {
+      route.onRequest.push(...onRequest);
     }
 
     // Register a new route.
@@ -80,7 +82,7 @@ const plugin = async (fastify, options) => {
   fastify.decorateRequest(DECORATOR_NAME, null);
 
   // Instead, decorate each incoming request.
-  fastify.addHook('onRequest', async request => {
+  fastify.addHook('onRequest', async function openApiRouterGlobalOnRequestHook(request) {
     request[DECORATOR_NAME] = {
       operation: {},
       security: {},

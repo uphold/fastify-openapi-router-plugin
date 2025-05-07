@@ -87,7 +87,7 @@ export const applyParamsCoercing = operation => {
     })
     .filter(Boolean);
 
-  return async request => {
+  return request => {
     coerceArrayParametersFns.forEach(fn => fn(request));
   };
 };
