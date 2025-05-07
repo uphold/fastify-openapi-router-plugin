@@ -22,7 +22,7 @@ export const parse = async options => {
       const operation = methods[method];
 
       const securityFn = applySecurity(operation, spec, options.securityHandlers, options.securityErrorMapper);
-      const applyParamsCoercingFn = applyParamsCoercing(operation);
+      const paramsCoercingFn = applyParamsCoercing(operation);
 
       // Build fastify route.
       const route = {
@@ -32,7 +32,7 @@ export const parse = async options => {
             request[DECORATOR_NAME].operation = operation;
 
             await securityFn?.(request);
-            applyParamsCoercingFn?.(request);
+            paramsCoercingFn?.(request);
           }
         ],
         schema: {
