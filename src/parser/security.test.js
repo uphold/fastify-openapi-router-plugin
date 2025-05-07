@@ -103,9 +103,9 @@ describe('applySecurity()', () => {
   });
 
   it('should return undefined if `security` is disabled in operation', async () => {
-    const onRequest = applySecurity({ security: [] }, { security: [{ OAuth2: [] }] }, {});
+    const securityFn = applySecurity({ security: [] }, { security: [{ OAuth2: [] }] }, {});
 
-    expect(onRequest).toBeUndefined();
+    expect(securityFn).toBeUndefined();
   });
 
   it('should stop at the first successful security block', async () => {
@@ -135,9 +135,9 @@ describe('applySecurity()', () => {
       OAuth2: vi.fn(async () => ({ data: 'OAuth2 data', scopes: [] }))
     };
 
-    const onRequest = applySecurity(operation, spec, securityHandlers);
+    const securityFn = applySecurity(operation, spec, securityHandlers);
 
-    await onRequest(request);
+    await securityFn(request);
 
     expect(securityHandlers.ApiKey).toHaveBeenCalledTimes(1);
     expect(securityHandlers.ApiKey).toHaveBeenCalledWith('api key', request);
@@ -190,9 +190,9 @@ describe('applySecurity()', () => {
       OAuth2: vi.fn(async () => ({ data: 'OAuth2 data', scopes: [] }))
     };
 
-    const onRequest = applySecurity(operation, spec, securityHandlers);
+    const securityFn = applySecurity(operation, spec, securityHandlers);
 
-    await onRequest(request);
+    await securityFn(request);
 
     expect(securityHandlers.ApiKey).toHaveBeenCalledTimes(1);
     expect(securityHandlers.ApiKey).toHaveBeenCalledWith('api key', request);
@@ -249,10 +249,10 @@ describe('applySecurity()', () => {
       OAuth2: vi.fn(async () => ({ data: 'OAuth2 data', scopes: [] }))
     };
 
-    const onRequest = applySecurity(operation, spec, securityHandlers);
+    const securityFn = applySecurity(operation, spec, securityHandlers);
 
     try {
-      await onRequest(request);
+      await securityFn(request);
     } catch (error) {
       expect(error).toBeInstanceOf(errors.UnauthorizedError);
       expect(error.securityReport).toMatchInlineSnapshot(`
@@ -299,12 +299,12 @@ describe('applySecurity()', () => {
       })
     };
 
-    const onRequest = applySecurity(operation, spec, securityHandlers);
+    const securityFn = applySecurity(operation, spec, securityHandlers);
 
     expect.assertions(2);
 
     try {
-      await onRequest(request);
+      await securityFn(request);
     } catch (err) {
       expect(err).toBeInstanceOf(errors.UnauthorizedError);
       expect(err.securityReport).toMatchInlineSnapshot(`
@@ -354,9 +354,9 @@ describe('applySecurity()', () => {
       OAuth2: vi.fn(async () => ({ data: 'OAuth2 data', scopes: ['write'] }))
     };
 
-    const onRequest = applySecurity(operation, spec, securityHandlers);
+    const securityFn = applySecurity(operation, spec, securityHandlers);
 
-    await onRequest(request);
+    await securityFn(request);
 
     expect(securityHandlers.OAuth2).toHaveBeenCalledTimes(1);
   });
@@ -385,12 +385,12 @@ describe('applySecurity()', () => {
       })
     };
 
-    const onRequest = applySecurity(operation, spec, securityHandlers);
+    const securityFn = applySecurity(operation, spec, securityHandlers);
 
     expect.assertions(2);
 
     try {
-      await onRequest(request);
+      await securityFn(request);
     } catch (err) {
       expect(err).toBeInstanceOf(errors.UnauthorizedError);
       expect(securityHandlers.OAuth2).toHaveBeenCalledTimes(1);
@@ -420,11 +420,11 @@ describe('applySecurity()', () => {
       OAuth2: vi.fn(async () => ({ data: 'OAuth2 data', scopes: [] }))
     };
 
-    const onRequest = applySecurity(operation, spec, securityHandlers);
+    const securityFn = applySecurity(operation, spec, securityHandlers);
 
     expect.assertions(3);
 
-    await onRequest(request);
+    await securityFn(request);
 
     expect(securityHandlers.ApiKey).not.toHaveBeenCalled();
     expect(securityHandlers.OAuth2).toHaveBeenCalledTimes(1);
@@ -468,12 +468,12 @@ describe('applySecurity()', () => {
       OAuth2: vi.fn(() => ({ data: 'OAuth2 data', scopes: ['read'] }))
     };
 
-    const onRequest = applySecurity(operation, spec, securityHandlers);
+    const securityFn = applySecurity(operation, spec, securityHandlers);
 
     expect.assertions(2);
 
     try {
-      await onRequest(request);
+      await securityFn(request);
     } catch (err) {
       expect(err).toBeInstanceOf(errors.UnauthorizedError);
       expect(err.securityReport).toMatchInlineSnapshot(`
@@ -513,9 +513,9 @@ describe('applySecurity()', () => {
       OAuth2: vi.fn(() => {})
     };
 
-    const onRequest = applySecurity(operation, spec, securityHandlers);
+    const securityFn = applySecurity(operation, spec, securityHandlers);
 
-    await onRequest(request);
+    await securityFn(request);
 
     expect(request[DECORATOR_NAME].security).toMatchObject({ OAuth2: undefined });
     expect(request[DECORATOR_NAME].securityReport).toMatchInlineSnapshot(`
@@ -554,12 +554,12 @@ describe('applySecurity()', () => {
       OAuth2: vi.fn(() => {})
     };
 
-    const onRequest = applySecurity(operation, spec, securityHandlers);
+    const securityFn = applySecurity(operation, spec, securityHandlers);
 
     expect.assertions(2);
 
     try {
-      await onRequest(request);
+      await securityFn(request);
     } catch (err) {
       expect(err).toBeInstanceOf(errors.UnauthorizedError);
       expect(err.securityReport).toMatchInlineSnapshot(`
@@ -603,12 +603,12 @@ describe('applySecurity()', () => {
     const customError = new Error('Mapped error');
     const securityErrorMapper = vi.fn(() => customError);
 
-    const onRequest = applySecurity(operation, spec, securityHandlers, securityErrorMapper);
+    const securityFn = applySecurity(operation, spec, securityHandlers, securityErrorMapper);
 
     expect.assertions(3);
 
     try {
-      await onRequest(request);
+      await securityFn(request);
     } catch (err) {
       expect(err).toBe(customError);
       expect(securityErrorMapper).toHaveBeenCalledTimes(1);
