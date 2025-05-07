@@ -1,5 +1,9 @@
 # Changelog
 
+## [v1.0.0](https://github.com/uphold/fastify-openapi-router-plugin/releases/tag/v1.0.0) (2025-05-07)
+
+- Add names to functions to play better with OpenTelemetry instrumentation [\#31](https://github.com/uphold/fastify-openapi-router-plugin/pull/31) ([satazor](https://github.com/satazor))
+
 ## [v0.8.0](https://github.com/uphold/fastify-openapi-router-plugin/releases/tag/v0.8.0) (2025-01-28)
 - Add mechanism to install not implemented routes [\#29](https://github.com/uphold/fastify-openapi-router-plugin/pull/29) ([boliveira](https://github.com/boliveira))
 - Bump vite from 5.4.6 to 5.4.14 [\#27](https://github.com/uphold/fastify-openapi-router-plugin/pull/27) ([dependabot](https://github.com/apps/dependabot))
