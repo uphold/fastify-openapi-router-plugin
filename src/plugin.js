@@ -2,10 +2,10 @@ import { DECORATOR_NAME } from './utils/constants.js';
 import { createNotImplementedError, errors } from './errors/index.js';
 import { parse } from './parser/index.js';
 
-const createRoute = (fastify, routes, notImplementedErrorMapper) => {
+const createRouting = (routes, notImplementedErrorMapper) => {
   const missingRoutes = new Set(Object.values(routes));
 
-  const addMissingRoutes = () => {
+  const addMissingRoutes = fastify => {
     missingRoutes.forEach(route => {
       fastify.route({
         ...route,
@@ -28,7 +28,7 @@ const createRoute = (fastify, routes, notImplementedErrorMapper) => {
     missingRoutes.clear();
   };
 
-  const addRoute = ({ method, onRequest, operationId, schema, url, ...routeOptions }) => {
+  const addRoute = (fastify, { method, onRequest, operationId, schema, url, ...routeOptions }) => {
     const route = routes[operationId];
 
     // Throw an error if the operation is unknown.
@@ -68,13 +68,19 @@ const plugin = async (fastify, options) => {
 
   const routes = await parse(options);
 
-  const { addMissingRoutes, addRoute } = createRoute(fastify, routes, options.notImplementedErrorMapper);
+  const { addMissingRoutes, addRoute } = createRouting(routes, options.notImplementedErrorMapper);
 
   // Decorate fastify object.
   fastify.decorate(DECORATOR_NAME, {
-    errors,
-    installNotImplementedRoutes: addMissingRoutes,
-    route: addRoute
+    getter: function () {
+      const fastify = this;
+
+      return {
+        errors,
+        installNotImplementedRoutes: () => addMissingRoutes(fastify),
+        route: route => addRoute(fastify, route)
+      };
+    }
   });
 
   // Avoid decorating the request with reference types.

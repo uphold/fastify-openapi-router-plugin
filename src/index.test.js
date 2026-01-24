@@ -164,4 +164,58 @@ describe('Fastify plugin', () => {
       );
     });
   });
+
+  describe('encapsulation', () => {
+    it('should use the correct fastify instance when calling oas.route() from a child plugin', async () => {
+      const app = fastify({ logger: false });
+
+      await app.register(OpenAPIRouter, { spec });
+
+      await app.register(async childFastify => {
+        childFastify.decorateRequest('customProperty', null);
+        childFastify.addHook('onRequest', async request => {
+          request.customProperty = 'decorated-value';
+        });
+
+        childFastify.oas.route({
+          handler: async request => {
+            return { customProperty: request.customProperty };
+          },
+          operationId: 'getPets'
+        });
+      });
+
+      const result = await app.inject({ url: '/pets' });
+
+      expect(result.json()).toMatchObject({
+        customProperty: 'decorated-value'
+      });
+    });
+
+    it('should use the correct fastify instance when calling oas.installNotImplementedRoutes() from a child plugin', async () => {
+      const app = fastify({ logger: false });
+
+      await app.register(OpenAPIRouter, { spec });
+
+      await app.register(async childFastify => {
+        childFastify.decorateRequest('customProperty', null);
+        childFastify.addHook('onRequest', async request => {
+          request.customProperty = 'decorated-value';
+        });
+
+        childFastify.oas.route({
+          handler: async request => {
+            return { customProperty: request.customProperty };
+          },
+          operationId: 'getPets'
+        });
+
+        childFastify.oas.installNotImplementedRoutes();
+      });
+
+      const postPetsResult = await app.inject({ method: 'POST', url: '/pets' });
+
+      expect(postPetsResult.statusCode).toBe(501);
+    });
+  });
 });
