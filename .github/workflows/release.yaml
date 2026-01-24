@@ -16,19 +16,25 @@ on:
 jobs:
   release:
     runs-on: ubuntu-latest
-    concurrency: "1"
+    concurrency:
+      group: release
+      cancel-in-progress: false
     environment: release
+    permissions:
+      contents: write
+      id-token: write
 
     steps:
     - name: Checkout code
-      uses: actions/checkout@v4
+      uses: actions/checkout@v6
       with:
-        token: ${{ secrets.RELEASE_GITHUB_TOKEN }}
+        persist-credentials: false
 
     - name: Setup Node.js version
-      uses: actions/setup-node@v4
+      uses: actions/setup-node@v6
       with:
-        node-version: 22
+        node-version: 24
+        registry-url: 'https://registry.npmjs.org/'
 
     - name: Install dependencies
       run: npm ci
@@ -40,8 +46,6 @@ jobs:
 
     - name: Generate release
       env:
-        NPM_TOKEN: ${{ secrets.RELEASE_NPM_TOKEN }}
         GITHUB_TOKEN: ${{ secrets.RELEASE_GITHUB_TOKEN }}
       run: |
-        echo "//registry.npmjs.org/:_authToken=\${NPM_TOKEN}" > .npmrc
         npm run release -- --increment ${{ github.event.inputs.VERSION_BUMP }} -V
