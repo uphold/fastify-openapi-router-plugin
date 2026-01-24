@@ -1,5 +1,14 @@
 # Changelog
 
+## [v1.0.2](https://github.com/uphold/fastify-openapi-router-plugin/releases/tag/v1.0.2) (2026-01-24)
+
+- Update package version manually so we can publish again [\#37](https://github.com/uphold/fastify-openapi-router-plugin/pull/37) ([satazor](https://github.com/satazor))
+- Add missing git config step to release workflow [\#36](https://github.com/uphold/fastify-openapi-router-plugin/pull/36) ([satazor](https://github.com/satazor))
+- Adjust release-it to work for npm trusted publishing [\#35](https://github.com/uphold/fastify-openapi-router-plugin/pull/35) ([satazor](https://github.com/satazor))
+- Update release action [\#34](https://github.com/uphold/fastify-openapi-router-plugin/pull/34) ([satazor](https://github.com/satazor))
+- Fix plugin not using encapsulated fastify instance [\#33](https://github.com/uphold/fastify-openapi-router-plugin/pull/33) ([satazor](https://github.com/satazor))
+- Fix variable name inconsistency [\#32](https://github.com/uphold/fastify-openapi-router-plugin/pull/32) ([satazor](https://github.com/satazor))
+
 ## [v1.0.0](https://github.com/uphold/fastify-openapi-router-plugin/releases/tag/v1.0.0) (2025-05-07)
 
 - Add names to functions to play better with OpenTelemetry instrumentation [\#31](https://github.com/uphold/fastify-openapi-router-plugin/pull/31) ([satazor](https://github.com/satazor))
