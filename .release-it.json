@@ -11,6 +11,10 @@
     "release": true,
     "releaseName": "v${version}"
   },
+  "npm": {
+    "publish": true,
+    "skipChecks": true
+  },
   "hooks": {
     "after:bump": [
       "touch CHANGELOG.md",
