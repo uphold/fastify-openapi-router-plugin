@@ -43,6 +43,7 @@ jobs:
       run: |
         git config user.name "Uphold"
         git config user.email "bot@uphold.com"
+        git config --global url.https://${{ secrets.RELEASE_GITHUB_TOKEN }}@github.com/.insteadOf https://github.com/
 
     - name: Generate release
       env:
