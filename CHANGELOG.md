@@ -1,5 +1,9 @@
 # Changelog
 
+## [v1.1.0](https://github.com/uphold/fastify-openapi-router-plugin/releases/tag/v1.1.0) (2026-03-25)
+
+- Update dependencies [\#38](https://github.com/uphold/fastify-openapi-router-plugin/pull/38) ([satazor](https://github.com/satazor))
+
 ## [v1.0.2](https://github.com/uphold/fastify-openapi-router-plugin/releases/tag/v1.0.2) (2026-01-24)
 
 - Update package version manually so we can publish again [\#37](https://github.com/uphold/fastify-openapi-router-plugin/pull/37) ([satazor](https://github.com/satazor))
