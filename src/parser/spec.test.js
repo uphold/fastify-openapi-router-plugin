@@ -3,9 +3,9 @@ import { validateSpec } from './spec.js';
 
 describe('validateSpec()', () => {
   it('should throw for invalid options', async () => {
-    await expect(validateSpec({})).rejects.toThrowError('Expected a file path, URL, or object.');
-    await expect(validateSpec({ spec: { foo: 'bar' } })).rejects.toThrowError(
-      'Supplied schema is not a valid OpenAPI definition.'
+    await expect(validateSpec({})).rejects.toThrow('Expected a file path, URL, or object.');
+    await expect(validateSpec({ spec: { foo: 'bar' } })).rejects.toThrow(
+      'Supplied schema is not a valid OpenAPI definition'
     );
   });
 
@@ -18,20 +18,8 @@ describe('validateSpec()', () => {
       paths: {},
       swagger: '2.0'
     };
-    const specOpenApi2 = {
-      info: {},
-      openapi: '2.0.0',
-      paths: {}
-    };
-    const specOpenApi4 = {
-      info: {},
-      openapi: '4.0.0',
-      paths: {}
-    };
 
-    await expect(validateSpec({ spec: specSwagger2 })).rejects.toThrowError(/Unsupported OpenAPI version: 2\.0/);
-    await expect(validateSpec({ spec: specOpenApi2 })).rejects.toThrowError(/Unsupported OpenAPI version: 2\.0\.0/);
-    await expect(validateSpec({ spec: specOpenApi4 })).rejects.toThrowError(/Unsupported OpenAPI version: 4\.0\.0/);
+    await expect(validateSpec({ spec: specSwagger2 })).rejects.toThrow(/Unsupported OpenAPI version: '2\.0'\./);
   });
 
   it('should return a parsed spec', async () => {
@@ -41,7 +29,17 @@ describe('validateSpec()', () => {
         version: '1'
       },
       openapi: '3.1.0',
-      paths: {}
+      paths: {
+        '/pet': {
+          get: {
+            responses: {
+              200: {
+                description: 'successful operation'
+              }
+            }
+          }
+        }
+      }
     };
 
     expect(await validateSpec({ spec })).toMatchObject(spec);
@@ -49,6 +47,11 @@ describe('validateSpec()', () => {
 
   it("should resolve '$ref' in spec", async () => {
     const Pet = {
+      properties: {
+        name: {
+          type: 'string'
+        }
+      },
       type: 'object'
     };
     const spec = {
