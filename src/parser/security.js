@@ -127,8 +127,11 @@ export const validateSecurity = (spec, options) => {
   const securitySchemes = spec.components?.securitySchemes;
 
   // Check if 'securityHandlers' option is defined as an object.
+  // The message names the option that is actually being validated: the previous text blamed
+  // `options.securitySchemes`, which is not an option this plugin accepts, sending an operator
+  // debugging a boot failure after a key that does not exist.
   if (options.securityHandlers != null && !_.isPlainObject(options.securityHandlers)) {
-    throw new TypeError(`Expected 'options.securitySchemes' to be an object.`);
+    throw new TypeError(`Expected 'options.securityHandlers' to be an object.`);
   }
 
   // Check if all declared security schemes have a valid handler.

@@ -16,6 +16,7 @@ declare module 'fastify' {
     [DECORATOR_NAME]: {
       errors: typeof errors
       route: (opts: RouteOptions) => FastifyInstance;
+      installNotImplementedRoutes: () => void;
     }
   }
 }
@@ -47,7 +48,15 @@ export interface RouteOptions extends Omit<FastifyRouteOptions, "method" | "sche
 
 export interface PluginOptions {
   spec?: string | OpenAPI.OpenAPIV3.Document | OpenAPI.OpenAPIV3_1.Document
-  securityErrorMapper: (error: errors.UnauthorizedError) => Error | undefined
+  /**
+   * Optional mapper invoked when every declared security scheme fails. Return an `Error` to
+   * replace the generated unauthorized error, or `undefined` to keep it.
+   */
+  securityErrorMapper?: (error: errors.UnauthorizedError) => Error | undefined
+  /**
+   * Optional mapper invoked when a route declared by the spec has no handler registered.
+   */
+  notImplementedErrorMapper?: (error: errors.NotImplementedError) => Error | undefined
   securityHandlers?: {
     [key:string]: SecurityHandler
   }

@@ -46,7 +46,12 @@ fastify.oas.route({
 You can pass the following options during the plugin registration:
 
 ```js
-await fastify.register(import('@fastify/fastify-openapi-router-plugin'), {
+import Fastify from 'fastify';
+import openApiRouterPlugin from '@uphold/fastify-openapi-router-plugin';
+
+const fastify = Fastify();
+
+await fastify.register(openApiRouterPlugin, {
   spec: './petstore.json',
   securityHandlers: {
     APIAuth: (value, request) => {}
@@ -68,7 +73,12 @@ If you don't provide a valid OpenAPI specification, the plugin will throw an err
 **Sample using a file path**
 
 ```js
-await fastify.register(import('@fastify/fastify-openapi-router-plugin'), {
+import Fastify from 'fastify';
+import openApiRouterPlugin from '@uphold/fastify-openapi-router-plugin';
+
+const fastify = Fastify();
+
+await fastify.register(openApiRouterPlugin, {
   spec: './petstore.json' // or spec: './petstore.yaml'
 });
 ```
@@ -76,7 +86,12 @@ await fastify.register(import('@fastify/fastify-openapi-router-plugin'), {
 **Sample using an object**
 
 ```js
-await fastify.register(import('@fastify/fastify-openapi-router-plugin'), {
+import Fastify from 'fastify';
+import openApiRouterPlugin from '@uphold/fastify-openapi-router-plugin';
+
+const fastify = Fastify();
+
+await fastify.register(openApiRouterPlugin, {
   spec: {
     openapi: '3.1.0',
     ...
@@ -97,7 +112,12 @@ The security handler should either throw an error or return an object with `{ da
 **Sample using OAuth 2.0**
 
 ```js
-await fastify.register(import('@fastify/fastify-openapi-router-plugin'), {
+import Fastify from 'fastify';
+import openApiRouterPlugin from '@uphold/fastify-openapi-router-plugin';
+
+const fastify = Fastify();
+
+await fastify.register(openApiRouterPlugin, {
   spec: {
     openapi: '3.1.0',
     ...
@@ -140,7 +160,7 @@ await fastify.register(import('@fastify/fastify-openapi-router-plugin'), {
 Any error thrown by the security handler will be internally wrapped in a `SecurityHandlerError` with `fatal = true`, which will stop further security blocks to be executed. If you wish to continue with the next security block, you can `throw createSecurityHandlerError(error, false)` in your handler.
 
 > [!TIP]
-> The `scopes` returned by the security handler can contain trailing **wildcards**. For example, if the security handler returns `{ scopes: ['pets:*'] }`, the route will be authorized for any security scope that starts with `pets:`.
+> The `scopes` returned by the security handler can contain trailing **wildcards**. For example, if the security handler returns `{ scopes: ['pets:*'] }`, the route will be authorized for any security scope that starts with `pets:`. Note that a wildcard only grants scopes that extend its prefix: `{ scopes: ['pets:*'] }` does **not** authorize the bare `pets:` scope itself, and `{ scopes: ['*'] }` does not authorize an empty scope.
 
 > [!IMPORTANT]
 > If your specification uses `http` security schemes with `in: cookie`, you must register [@fastify/cookie](https://github.com/fastify/fastify-cookie) before this plugin.
@@ -150,10 +170,18 @@ Any error thrown by the security handler will be internally wrapped in a `Securi
 The plugin will throw an `UnauthorizedError` when none of the `security` blocks succeed. By default, this error originates a `401` reply with `{ code: 'FST_OAS_UNAUTHORIZED', message: 'Unauthorized' }` as the payload. You can override this behavior by leveraging the `securityErrorMapper` option:
 
 ```js
-await fastify.register(import('@fastify/fastify-openapi-router-plugin'), {
+import Fastify from 'fastify';
+import openApiRouterPlugin from '@uphold/fastify-openapi-router-plugin';
+
+const fastify = Fastify();
+
+await fastify.register(openApiRouterPlugin, {
   spec: './petstore.json',
   securityHandlers: {
-    OAuth2: async (request, reply) => {
+    // The first argument is the credential extracted for the scheme (here the OAuth2
+    // bearer token), the second is the fastify request. Returning an object stores it in
+    // equest.openApiRouter.security. Returning nothing/undefined continues to the next scheme.
+    OAuth2: async (token, request) => {
       // ...
     }
   },
@@ -190,7 +218,12 @@ If you don't define a `securityErrorMapper`, you can still catch the `Unauthoriz
 The plugin will throw an `NotImplementedError` when you install a handler for not implemented specs through `fastify.oas.installNotImplementedRoutes()` function. By default, this error originates a `501` reply with `{ code: 'FST_OAS_NOT_IMPLEMENTED', message: 'Not implemented' }` as the payload. You can override this behavior by leveraging the `notImplementedErrorMapper` option:
 
 ```js
-await fastify.register(import('@fastify/fastify-openapi-router-plugin'), {
+import Fastify from 'fastify';
+import openApiRouterPlugin from '@uphold/fastify-openapi-router-plugin';
+
+const fastify = Fastify();
+
+await fastify.register(openApiRouterPlugin, {
   spec: './petstore.json',
   notImplementedErrorMapper: (notImplementedError) => {
     return MyNotImplementedError();
@@ -211,7 +244,12 @@ This method is used to register a new route by translating the given `operationI
 **Example**
 
 ```js
-await fastify.register(import('@fastify/fastify-openapi-router-plugin'), {
+import Fastify from 'fastify';
+import openApiRouterPlugin from '@uphold/fastify-openapi-router-plugin';
+
+const fastify = Fastify();
+
+await fastify.register(openApiRouterPlugin, {
   spec: './petstore.json'
 });
 
@@ -231,7 +269,12 @@ This function will register handlers with fastify for the routes in the spec tha
 **Example**
 
 ```js
-await fastify.register(import('@fastify/fastify-openapi-router-plugin'), {
+import Fastify from 'fastify';
+import openApiRouterPlugin from '@uphold/fastify-openapi-router-plugin';
+
+const fastify = Fastify();
+
+await fastify.register(openApiRouterPlugin, {
   spec: './petstore.json'
 });
 
@@ -269,10 +312,17 @@ For your convenience, the object `request.oas` is populated with data related to
 **Example**
 
 ```js
-await fastify.register(import('@fastify/fastify-openapi-router-plugin'), {
+import Fastify from 'fastify';
+import openApiRouterPlugin from '@uphold/fastify-openapi-router-plugin';
+
+const fastify = Fastify();
+
+await fastify.register(openApiRouterPlugin, {
   spec: './petstore.json',
   securityHandlers: {
-    OAuth2: async (request, reply) => {
+    // 	oken is the credential extracted for the OAuth2 scheme, equest is the
+    // fastify request.
+    OAuth2: async (token, request) => {
       // Validate and decode token.
       const { userId, scopes } = verifyToken(token);
 
@@ -305,7 +355,7 @@ This object contains all error classes that can be thrown by the plugin. It cont
 
 Checks if the `providedScopes` satisfy the `requiredScopes`. Returns an array of missing scopes or an empty array if all scopes are satisfied.
 
-This functions supports trailing **wildcards** on `providedScopes`. For example, if the provided scopes is `['pets:*']` and the required scopes is `['pets:read']`, the function will return an empty array.
+This functions supports trailing **wildcards** on `providedScopes`. For example, if the provided scopes is `['pets:*']` and the required scopes is `['pets:read']`, the function will return an empty array. A wildcard never grants the prefix itself: `['pets:*']` against `['pets:']` returns `['pets:']` as missing.
 
 ### Caveats
 
